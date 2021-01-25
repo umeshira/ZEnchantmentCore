@@ -1,0 +1,3 @@
+# Disables any enchantments in the list (applies for all addons), ex. ['life_steal', 'my_enchant']
+# This option bugs out the enchantments (enchantment table, etc) if you reload the plugin without restarting the server properly.
+disabled-enchantments: []
