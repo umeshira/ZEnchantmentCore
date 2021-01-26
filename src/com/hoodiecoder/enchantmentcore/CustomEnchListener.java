@@ -36,7 +36,7 @@ public abstract class CustomEnchListener implements Listener {
 	}
 	@EventHandler
 	public void onEvent(org.bukkit.event.entity.EntityAirChangeEvent event) {
-		runApplicableTypes(event);
+		//runApplicableTypes(event); Disabled until seen as necessary
 		
 	}
 	@EventHandler
@@ -123,11 +123,11 @@ public abstract class CustomEnchListener implements Listener {
 	private static Entity getEntityFromType(ListenerType ltype, Event event) {
 		Entity entityPlayer = null;
 		switch (ltype) {
+		case ENTITY_TAKE_DAMAGE:
 		case ENTITY_AIR:
 		case ENTITY_DEATH:
 		case ENTITY_DROP:
 		case ENTITY_INTERACT:
-		case ENTITY_TAKE_DAMAGE:
 		case ENTITY_POTION:
 		case ENTITY_REGAIN_HEALTH:
 		case ENTITY_SHOOT_BOW:
@@ -248,13 +248,15 @@ public abstract class CustomEnchListener implements Listener {
 				continue;
 			} else {
 				List<Integer> levels = new LinkedList<>();
+				List<ItemStack> items = new LinkedList<>();
 				for (Object o : applicableItems) {
+					items.add((ItemStack)o);
 					levels.add(((ItemStack)o).getEnchantmentLevel(ench));
 				}
-				onCustomEvent(event, ce, levels, ltype);
+				onCustomEvent(event, ce, levels, items, ltype);
 			}
 		}
 		
 	}
-	public abstract void onCustomEvent(Event event, CoreEnchParent ench, List<Integer> levels, ListenerType ltype);
+	public abstract void onCustomEvent(Event event, CoreEnchParent ench, List<Integer> levels, List<ItemStack> items, ListenerType ltype);
 }
