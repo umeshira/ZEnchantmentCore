@@ -25,13 +25,13 @@ import net.md_5.bungee.api.ChatColor;
 
 public class EnchantmentCore extends JavaPlugin implements Listener {
 private static EnchantmentCore instance;
-private static int enchLimit = 37;
-public static List<CoreEnchParent> enchList = new LinkedList<>();
+private int enchLimit = 37;
+public static List<CoreEnchParent> enchList = new LinkedList<>(); // this is technically a constant, but must be accessible during initialization for adding items, hence no final keyword
 static final String[] numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
 
 @Override
 public void onEnable() {
-	instance = this;
+	instance = getPlugin(this.getClass());
 	FileConfiguration config = getConfig();
 	config.options().copyDefaults(true);
 	saveConfig();

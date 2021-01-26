@@ -2,6 +2,8 @@ package com.hoodiecoder.enchantmentcore.nms;
 
 import java.lang.reflect.Field;
 
+import org.bukkit.Bukkit;
+
 import com.hoodiecoder.enchantmentcore.EnchantmentCore;
 
 import net.minecraft.server.v1_16_R1.Enchantment;
@@ -25,12 +27,18 @@ public class CoreEnch_v1_16_R1 extends Enchantment implements CoreEnchParent {
 		}
 		slotType = var1;
 		c = displayName;
+		try {
+		if (!EnchantmentCore.enchList.contains(this)) EnchantmentCore.enchList.add(this);
+		} catch (NullPointerException e) {
+			disabled = true;
+			Bukkit.getConsoleSender().sendMessage("Unable to register enchantment! Initialize your enchantment on enable.");
+		}
 		coreID = nextID;
 		nextID++;
 		this.maxLevel = maxLevel;
 		intName = name;
 		this.displayName = displayName;
-		if (!EnchantmentCore.enchList.contains(this)) EnchantmentCore.enchList.add(this);
+		
 	}
 	@Override
 	public int getMaxLevel() {

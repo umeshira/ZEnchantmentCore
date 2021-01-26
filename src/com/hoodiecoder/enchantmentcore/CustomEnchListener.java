@@ -158,7 +158,7 @@ public abstract class CustomEnchListener implements Listener {
 		}
 		return entityPlayer;
 	}
-	private static Object[] getApplicableItems(CoreEnchParent ce, PlayerInventory playerInv) {
+	private Object[] getApplicableItems(CoreEnchParent ce, PlayerInventory playerInv) {
 		Object[] applicableItems;
 		if (ce.isDisabled()) return null;
 		Enchantment ench = ce.getCraftEnchant();
