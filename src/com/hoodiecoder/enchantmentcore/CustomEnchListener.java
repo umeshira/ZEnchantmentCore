@@ -16,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-import com.hoodiecoder.enchantmentcore.nms.CoreEnchParent;
-
 public abstract class CustomEnchListener implements Listener {
 	private final CoreEnchParent[] listEnchs;
 	@SuppressWarnings("unused")

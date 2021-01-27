@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 public interface NameableCraftEnchantment {
 	public String getName();

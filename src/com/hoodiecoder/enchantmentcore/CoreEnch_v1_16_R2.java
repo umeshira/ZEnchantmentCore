@@ -1,10 +1,6 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 import java.lang.reflect.Field;
-
-import org.bukkit.Bukkit;
-
-import com.hoodiecoder.enchantmentcore.EnchantmentCore;
 
 import net.minecraft.server.v1_16_R2.Enchantment;
 import net.minecraft.server.v1_16_R2.EnchantmentSlotType;
@@ -27,12 +23,6 @@ public class CoreEnch_v1_16_R2 extends Enchantment implements CoreEnchParent {
 		}
 		slotType = var1;
 		c = displayName;
-		try {
-		if (!EnchantmentCore.enchList.contains(this)) EnchantmentCore.enchList.add(this);
-		} catch (NullPointerException e) {
-			disabled = true;
-			Bukkit.getConsoleSender().sendMessage("Unable to register enchantment! Initialize your enchantment on enable.");
-		}
 		coreID = nextID;
 		nextID++;
 		this.maxLevel = maxLevel;
@@ -47,7 +37,7 @@ public class CoreEnch_v1_16_R2 extends Enchantment implements CoreEnchParent {
 	public String getDisplayName() {
 		return displayName;
 	}
-	public void checkRegisterEnch(boolean resetting, int id) {
+	void checkRegisterEnch(boolean resetting, int id) {
 		if (IRegistry.ENCHANTMENT.a(this) == -1) {
 			try {
 				Field f = IRegistry.ENCHANTMENT.getClass().getDeclaredField("bl");
@@ -75,7 +65,7 @@ public class CoreEnch_v1_16_R2 extends Enchantment implements CoreEnchParent {
 	public boolean isDisabled() {
 		return disabled;
 	}
-	public void setDisabled(boolean d) {
+	void setDisabled(boolean d) {
 		disabled = d;
 	}
 	public String getInternalName() {

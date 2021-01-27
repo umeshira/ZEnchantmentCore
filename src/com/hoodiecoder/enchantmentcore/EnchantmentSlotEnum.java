@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 public enum EnchantmentSlotEnum {
 	ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_CHEST, ARMOR_HEAD, WEAPON, DIGGER,

@@ -1,6 +1,6 @@
 name: ZEnchantmentCore
 main: com.hoodiecoder.enchantmentcore.EnchantmentCore
-version: 1.1.1
+version: 1.2.0
 api-version: 1.16
 depend: []
 commands:
@@ -10,7 +10,10 @@ commands:
     ze:
       description: Main ZEnchantmentCore command.
       usage: /ze [args]
-#permissions:
-#  zenchants.sample:
-#    description: Sample permission.
-#    default: op
+permissions:
+  zenchantmentcore.help:
+    description: Allows player to use /ze help.
+    default: true
+  zenchantmentcore.util:
+    description: Allows player to use /ze utility commands.
+    default: op

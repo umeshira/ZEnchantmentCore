@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,10 +7,11 @@ import org.bukkit.Bukkit;
 
 
 public class CoreEnchWrapper {
+	List<String> l;
 	private static int enchLimit = 37;
 	private final CoreEnchParent coreEnch;
 	private static final String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-	public CoreEnchWrapper(RarityEnum var0, EnchantmentSlotEnum var1, ItemSlotEnum[] var2, String name, String displayName, int maxLevel) {
+	public CoreEnchWrapper(EnchantmentHolder holder, RarityEnum var0, EnchantmentSlotEnum var1, ItemSlotEnum[] var2, String name, String displayName, int maxLevel) {
 		if (version.equals("v1_16_R3")) {
 			enchLimit = 37;
 			net.minecraft.server.v1_16_R3.EnchantmentSlotType slotType;
@@ -315,11 +316,30 @@ public class CoreEnchWrapper {
 			this.coreEnch = new CoreEnch_v1_16_R1(rarity, slotType, enumSlot, name, displayName, maxLevel);
 		}
 		else coreEnch = null;
+		holder.addEnchant(this);
 	}
 	public CoreEnchParent getCoreEnch() {
 		return coreEnch;
 	}
 	public static int getEnchLimit() {
 		return enchLimit;
+	}
+	void setDisabled(boolean d) {
+		if (version.equals("v1_16_R3")) {
+			((CoreEnch_v1_16_R3) coreEnch).setDisabled(d);
+		} else if (version.equals("v1_16_R2")) {
+			((CoreEnch_v1_16_R2) coreEnch).setDisabled(d);
+		} else if (version.equals("v1_16_R1")) {
+			((CoreEnch_v1_16_R1) coreEnch).setDisabled(d);
+		}
+	}
+	void checkRegisterEnch(boolean resetting, int id) {
+		if (version.equals("v1_16_R3")) {
+			((CoreEnch_v1_16_R3) coreEnch).checkRegisterEnch(resetting, id);
+		} else if (version.equals("v1_16_R2")) {
+			((CoreEnch_v1_16_R2) coreEnch).checkRegisterEnch(resetting, id);
+		} else if (version.equals("v1_16_R1")) {
+			((CoreEnch_v1_16_R1) coreEnch).checkRegisterEnch(resetting, id);
+		}
 	}
 }

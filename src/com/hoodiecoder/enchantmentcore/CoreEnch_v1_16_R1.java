@@ -1,18 +1,14 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.Bukkit;
+import net.minecraft.server.v1_16_R1.Enchantment;
+import net.minecraft.server.v1_16_R1.EnchantmentSlotType;
+import net.minecraft.server.v1_16_R1.EnumItemSlot;
+import net.minecraft.server.v1_16_R1.IRegistry;
+import net.minecraft.server.v1_16_R1.MinecraftKey;
 
-import com.hoodiecoder.enchantmentcore.EnchantmentCore;
-
-import net.minecraft.server.v1_16_R3.Enchantment;
-import net.minecraft.server.v1_16_R3.EnchantmentSlotType;
-import net.minecraft.server.v1_16_R3.EnumItemSlot;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-
-public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
+public class CoreEnch_v1_16_R1 extends Enchantment implements CoreEnchParent {
 	private static int nextID = 0;
 	private final int coreID, maxLevel;
 	private final String intName;
@@ -20,19 +16,13 @@ public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
 	private final EnchantmentSlotType slotType;
 	private boolean disabled = false;
 	
-	CoreEnch_v1_16_R3(Rarity var0, EnchantmentSlotType var1, EnumItemSlot[] var2, String name, String displayName, int maxLevel) {
+	CoreEnch_v1_16_R1(Rarity var0, EnchantmentSlotType var1, EnumItemSlot[] var2, String name, String displayName, int maxLevel) {
 		super(var0, var1, var2);
 		if (maxLevel > 10) {
 			maxLevel = 10;
 		}
 		slotType = var1;
 		c = displayName;
-		try {
-			if (!EnchantmentCore.enchList.contains(this)) EnchantmentCore.enchList.add(this);
-			} catch (NullPointerException e) {
-			disabled = true;
-			Bukkit.getConsoleSender().sendMessage("Unable to register enchantment! Initialize your enchantment on enable.");
-		}
 		coreID = nextID;
 		nextID++;
 		this.maxLevel = maxLevel;
@@ -47,10 +37,17 @@ public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
 	public String getDisplayName() {
 		return displayName;
 	}
-	public void checkRegisterEnch(boolean resetting, int id) {
+	void checkRegisterEnch(boolean resetting, int id) {
 		if (IRegistry.ENCHANTMENT.a(this) == -1) {
 			try {
-				Field f = IRegistry.ENCHANTMENT.getClass().getDeclaredField("bl");
+				/* Tests for int fields, in case the name of the parameter is different
+				for (Field f : IRegistry.ENCHANTMENT.getClass().getDeclaredFields()) {
+					f.setAccessible(true);
+					if (f.getGenericType().toString() == "int") {
+					System.out.println("Field: " + f.getGenericType().toString() + " " + f.getName() + ", " + f.get(IRegistry.ENCHANTMENT));
+					}
+				}*/
+				Field f = IRegistry.ENCHANTMENT.getClass().getDeclaredField("bd");
 				Field f1 = org.bukkit.enchantments.Enchantment.class.getDeclaredField("acceptingNew");
 				f.setAccessible(true);
 				f1.setAccessible(true);
@@ -58,7 +55,7 @@ public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
 				if (resetting) f.set(IRegistry.ENCHANTMENT, id);
 				IRegistry.a(IRegistry.ENCHANTMENT, new MinecraftKey(intName), this);
 				try {
-				org.bukkit.enchantments.Enchantment.registerEnchantment(new NameableCraftEnchantment_v1_16_R3(this, intName));
+				org.bukkit.enchantments.Enchantment.registerEnchantment(new NameableCraftEnchantment_v1_16_R1(this, intName));
 				} catch (Exception e) {
 					EnchantmentCore.getInstance().getLogger().info("Skipping Registry for Enchantment " + new MinecraftKey(intName) + ".");
 				}
@@ -75,7 +72,7 @@ public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
 	public boolean isDisabled() {
 		return disabled;
 	}
-	public void setDisabled(boolean d) {
+	void setDisabled(boolean d) {
 		disabled = d;
 	}
 	public String getInternalName() {
@@ -86,7 +83,7 @@ public class CoreEnch_v1_16_R3 extends Enchantment implements CoreEnchParent {
 	}
 	public org.bukkit.enchantments.Enchantment getCraftEnchant() {
 		if (disabled) return null;
-		return (org.bukkit.enchantments.Enchantment) new NameableCraftEnchantment_v1_16_R3(this, intName);
+		return (org.bukkit.enchantments.Enchantment) new NameableCraftEnchantment_v1_16_R1(this, intName);
 	}
 	@Override
 	public String toString() {

@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore.nms;
+package com.hoodiecoder.enchantmentcore;
 
 import org.bukkit.craftbukkit.v1_16_R1.enchantments.CraftEnchantment;
 

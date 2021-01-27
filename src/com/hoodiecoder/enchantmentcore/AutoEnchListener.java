@@ -17,11 +17,8 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 //import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.hoodiecoder.enchantmentcore.nms.CoreEnchParent;
-
 public class AutoEnchListener implements Listener {
-	@SuppressWarnings("unused")
-	private EnchantmentCore core;
+	private final EnchantmentCore core;
 	public AutoEnchListener(EnchantmentCore c) {
 		core = c;
 	}
@@ -52,7 +49,8 @@ public class AutoEnchListener implements Listener {
 			List<String> currentLore = meta.getLore();
 			Map<Enchantment, Integer> parsedLore = EnchantmentCore.parseLore(currentLore);
 			boolean foundEnch = false;
-			for (CoreEnchParent ne : EnchantmentCore.enchList) {
+			for (CoreEnchWrapper cew : core.getEnchList()) {
+				CoreEnchParent ne = cew.getCoreEnch();
 				if (parsedLore == null || (enchs.containsKey(ne.getCraftEnchant()) && !parsedLore.containsKey(ne.getCraftEnchant()))) {
 					foundEnch = true;
 				}
