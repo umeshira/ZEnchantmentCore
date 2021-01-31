@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantmentHolder {
-private final List<CoreEnchWrapper> holder;
+private final List<CustomEnch> holder;
 public EnchantmentHolder() {
 	holder = new ArrayList<>();
 }
-void addEnchant(CoreEnchWrapper ench) {
-	holder.add(ench);
+boolean addEnchant(CustomEnch ench) {
+	if (!holder.contains(ench)) {
+		holder.add(ench);
+		return true;
+	} else {
+		return false;
+	}
 }
-boolean removeEnchant(CoreEnchWrapper ench) {
+boolean removeEnchant(CustomEnch ench) {
 	if (holder.contains(ench)) {
 		holder.remove(ench);
 		return true;
@@ -20,7 +25,7 @@ boolean removeEnchant(CoreEnchWrapper ench) {
 	}
 }
 public void registerPendingEnchants() {
-	for (CoreEnchWrapper cew : holder) {
+	for (CustomEnch cew : holder) {
 		if (!EnchantmentCore.getInstance().getEnchList().contains(cew)) {
 			EnchantmentCore.getInstance().addEnchant(cew);
 		}

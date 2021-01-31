@@ -6,10 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -19,6 +16,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.hoodiecoder.enchantmentcore.utils.AutoEnchListener;
+import com.hoodiecoder.enchantmentcore.utils.CustomEnchListener;
+import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
+import com.hoodiecoder.enchantmentcore.utils.ItemEnchantListener;
+import com.hoodiecoder.enchantmentcore.utils.UpdateChecker;
+
 import org.bukkit.ChatColor;
 
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -26,10 +30,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class EnchantmentCore extends JavaPlugin {
 private static EnchantmentCore instance;
-private int enchLimit = 37;
+private CustomEnchListener customListener;
 private boolean firstEnch = true;
-private final List<CoreEnchWrapper> enchList = new ArrayList<>();
-public static final String[] numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
+private final List<CustomEnch> enchList = new ArrayList<>();
 
 @Override
 public void onEnable() {
@@ -40,9 +43,10 @@ public void onEnable() {
 	PluginManager m = getServer().getPluginManager();
 	ItemEnchantListener iel = new ItemEnchantListener(this);
 	AutoEnchListener ael = new AutoEnchListener(this);
+	customListener = new CustomEnchListener(this);
 	m.registerEvents(iel, this);
 	m.registerEvents(ael, this);
-	enchLimit = CoreEnchWrapper.getEnchLimit();
+	m.registerEvents(customListener, this);
 	new UpdateChecker(this, 88310).getVersion(version -> {
 		if (!this.getDescription().getVersion().equalsIgnoreCase(version)) {
 			String str = ChatColor.DARK_AQUA + "ZEnchantmentCore » " + ChatColor.GRAY + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + this.getDescription().getVersion() + ChatColor.GRAY + ")";
@@ -93,8 +97,8 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 			case "list":
 				if (sender.hasPermission("zenchantmentcore.util")) {
 				sender.sendMessage(ChatColor.DARK_AQUA + "ZEnchantment » " + ChatColor.GRAY + "List of added enchantments (gray is disabled):");
-				for (CoreEnchWrapper cew : enchList) {
-					CoreEnchParent ce = cew.getCoreEnch();
+				for (CustomEnch cew : enchList) {
+					CoreEnch ce = cew.getCoreEnch();
 					ChatColor chatColor;
 					String levelRange;
 					if (ce.isDisabled()) {
@@ -105,7 +109,7 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 					if (ce.getMaxLevel()==1) {
 						levelRange = "";
 					} else {
-						levelRange = numerals[0] + "-" + numerals[ce.getMaxLevel()-1];
+						levelRange = EnchantmentUtils.numeralsArray()[0] + "-" + EnchantmentUtils.numeralsArray()[ce.getMaxLevel()-1];
 					}
 					sender.sendMessage(ChatColor.GRAY + " - " + chatColor + ce + ", " + ce.getDisplayName() + " " + levelRange);
 				}
@@ -126,10 +130,10 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 					} else {
 						org.bukkit.inventory.ItemStack main = player.getInventory().getItemInMainHand();
 						List<String> messages = new LinkedList<>();
-						for (CoreEnchWrapper cew : enchList) {
-							CoreEnchParent ce = cew.getCoreEnch();
+						for (CustomEnch cew : enchList) {
+							CoreEnch ce = cew.getCoreEnch();
 							if (!ce.isDisabled() && main.getEnchantments().containsKey(ce.getCraftEnchant())) {
-								messages.add(ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + ce + ", " + ce.getDisplayName() + " " + numerals[main.getEnchantmentLevel(ce.getCraftEnchant())-1]);
+								messages.add(ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + ce + ", " + ce.getDisplayName() + " " + EnchantmentUtils.numeralsArray()[main.getEnchantmentLevel(ce.getCraftEnchant())-1]);
 							}
 						}
 						if (messages.isEmpty()) {
@@ -161,59 +165,14 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 private List<String> getDisabledEnchants() {
 	return getConfig().getStringList("disabled-enchantments");
 }
-public static Map<Enchantment, Integer> parseLore(List<String> lore) {
-	String enchCode = ChatColor.GRAY.toString();
-	String endCode = ChatColor.GRAY + "" + ChatColor.MAGIC + " ";
-	Map<Enchantment, Integer> enchMap = new HashMap<>();
-	if (lore == null || lore.isEmpty()) return null;
-	for (String s : lore) {
-		String display = s.substring(enchCode.length());
-		int power = 1;
-		for (String n : numerals) {
-			if (display.indexOf(" " + n + endCode) != -1) {
-				display = display.substring(0, display.length()-n.length()-endCode.length()-1);
-				power = ArrayUtils.indexOf(numerals, n)+1;
-			}
-		}
-		if (s.startsWith(enchCode)) {
-			for (CoreEnchWrapper cew : getInstance().enchList) {
-				CoreEnchParent ne = cew.getCoreEnch();
-				if (getInstance().enchList.get(ne.getCoreID()) != null && s.startsWith(enchCode + ne.getDisplayName()) &&  ne.equals(getInstance().enchList.get(ne.getCoreID()).getCoreEnch())) {
-					enchMap.put(ne.getCraftEnchant(), power);
-				}
-			}
-		}
-	}
-	return enchMap;
-}
-public static List<String> createLore(Map<Enchantment, Integer> enchs, List<String> currentLore) {
-	String enchCode = ChatColor.GRAY.toString();
-	String endCode = ChatColor.GRAY + "" + ChatColor.MAGIC + " ";
-	List<String> lore = new LinkedList<String>();
-	for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
-		for (CoreEnchWrapper cew : getInstance().enchList) {
-			CoreEnchParent ne = cew.getCoreEnch();
-			if (!ne.isDisabled() && ne.getCraftEnchant() != null && e.getKey().equals(ne.getCraftEnchant())) {
-				if (currentLore == null || (ne.getMaxLevel() > 1 && !currentLore.contains(enchCode + ne.getDisplayName() + " " + numerals[e.getValue()-1] + endCode)) || (ne.getMaxLevel() <= 1 && !currentLore.contains(enchCode + ne.getDisplayName() + endCode))) {
-					if (ne.getMaxLevel() > 1) {
-						lore.add(enchCode + ne.getDisplayName() + " " + numerals[e.getValue()-1] + endCode);
-					} else {
-						lore.add(enchCode + ne.getDisplayName() + endCode);
-					}
-				}
-			}
-		}
-	}
-	return lore;
-}
 
 public static EnchantmentCore getInstance() {
 	return instance;
 }
 @Override
 public void onDisable() {
-	for (CoreEnchWrapper cew : getInstance().enchList) {
-		CoreEnchParent ce = cew.getCoreEnch();
+	for (CustomEnch cew : getInstance().enchList) {
+		CoreEnch ce = cew.getCoreEnch();
 		if (!ce.isDisabled()) {
 			unregisterEnch(ce.getCraftEnchant());
 		}
@@ -240,18 +199,20 @@ private void unregisterEnch(Enchantment ench) {
 			e.printStackTrace();
 	}
 }
-public List<CoreEnchWrapper> getEnchList() {
+public List<CustomEnch> getEnchList() {
 	return Collections.unmodifiableList(enchList);
 }
-void addEnchant(CoreEnchWrapper cew) {
-	enchList.add(cew);
-	CoreEnchParent ne = cew.getCoreEnch();
+void addEnchant(CustomEnch ce) {
+	if (!enchList.contains(ce)) {
+		enchList.add(ce);
+		customListener.addEnch(ce);
+	}
+	CoreEnch ne = ce.getCoreEnch();
 	if (!getDisabledEnchants().isEmpty() && getDisabledEnchants().contains(ne.getInternalName())) {
-		cew.setDisabled(true);
+		ce.setDisabled(true);
 	}
 	if (!ne.isDisabled()) {
-		System.out.println("registering ench " + enchLimit+ne.getCoreID()+1);
-		cew.checkRegisterEnch(firstEnch, enchLimit+ne.getCoreID()+1);
+		ce.checkRegisterEnch(firstEnch, EnchantmentUtils.getEnchantLimit()+ne.getCoreID()+1);
 		if (firstEnch == true) {
 			firstEnch = false;
 		}

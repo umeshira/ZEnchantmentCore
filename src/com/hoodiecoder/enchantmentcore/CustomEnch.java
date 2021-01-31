@@ -1,23 +1,39 @@
 package com.hoodiecoder.enchantmentcore;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityAirChangeEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.inventory.ItemStack;
+
+import com.hoodiecoder.enchantmentcore.utils.EnchEnums.*;
+import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
 
 
-public class CoreEnchWrapper {
+public abstract class CustomEnch {
 	List<String> l;
 	private static int enchLimit = 37;
-	private final CoreEnchParent coreEnch;
-	private static final String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-	public CoreEnchWrapper(EnchantmentHolder holder, RarityEnum var0, EnchantmentSlotEnum var1, ItemSlotEnum[] var2, String name, String displayName, int maxLevel) {
-		if (version.equals("v1_16_R3")) {
+	private final CoreEnch coreEnch;
+	public CustomEnch(EnchantmentHolder holder) {
+		if (EnchantmentUtils.getNMSVersion().equals("v1_16_R3")) {
 			enchLimit = 37;
 			net.minecraft.server.v1_16_R3.EnchantmentSlotType slotType;
 			net.minecraft.server.v1_16_R3.Enchantment.Rarity rarity;
 			net.minecraft.server.v1_16_R3.EnumItemSlot[] enumSlot = null;
-			switch (var1) {
+			switch (getEnchantmentSlot()) {
 			case ARMOR:
 				slotType = net.minecraft.server.v1_16_R3.EnchantmentSlotType.ARMOR;
 				break;
@@ -65,7 +81,7 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			switch (var0) {
+			switch (getRarity()) {
 			case COMMON:
 				rarity = net.minecraft.server.v1_16_R3.Enchantment.Rarity.COMMON;
 				break;
@@ -83,8 +99,8 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			List<net.minecraft.server.v1_16_R3.EnumItemSlot> eList = new LinkedList<>();
-			for (ItemSlotEnum e : var2) {
+			List<net.minecraft.server.v1_16_R3.EnumItemSlot> eList = new ArrayList<>();
+			for (ItemSlotEnum e : getItemSlot()) {
 				switch (e) {
 				case CHEST:
 					eList.add(net.minecraft.server.v1_16_R3.EnumItemSlot.CHEST);
@@ -111,14 +127,14 @@ public class CoreEnchWrapper {
 				}
 				enumSlot = eList.toArray(new net.minecraft.server.v1_16_R3.EnumItemSlot[0]);
 			}
-			this.coreEnch = new CoreEnch_v1_16_R3(rarity, slotType, enumSlot, name, displayName, maxLevel);
+			this.coreEnch = new CoreEnch_v1_16_R3(rarity, slotType, enumSlot, getName(), getDisplayName(), getMaxLevel());
 		}
-		else if (version.equals("v1_16_R2")) {
+		else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R2")) {
 			enchLimit = 37;
 			net.minecraft.server.v1_16_R2.EnchantmentSlotType slotType;
 			net.minecraft.server.v1_16_R2.Enchantment.Rarity rarity;
 			net.minecraft.server.v1_16_R2.EnumItemSlot[] enumSlot = null;
-			switch (var1) {
+			switch (getEnchantmentSlot()) {
 			case ARMOR:
 				slotType = net.minecraft.server.v1_16_R2.EnchantmentSlotType.ARMOR;
 				break;
@@ -166,7 +182,7 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			switch (var0) {
+			switch (getRarity()) {
 			case COMMON:
 				rarity = net.minecraft.server.v1_16_R2.Enchantment.Rarity.COMMON;
 				break;
@@ -184,8 +200,8 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			List<net.minecraft.server.v1_16_R2.EnumItemSlot> eList = new LinkedList<>();
-			for (ItemSlotEnum e : var2) {
+			List<net.minecraft.server.v1_16_R2.EnumItemSlot> eList = new ArrayList<>();
+			for (ItemSlotEnum e : getItemSlot()) {
 				switch (e) {
 				case CHEST:
 					eList.add(net.minecraft.server.v1_16_R2.EnumItemSlot.CHEST);
@@ -212,14 +228,14 @@ public class CoreEnchWrapper {
 				}
 				enumSlot = eList.toArray(new net.minecraft.server.v1_16_R2.EnumItemSlot[0]);
 			}
-			this.coreEnch = new CoreEnch_v1_16_R2(rarity, slotType, enumSlot, name, displayName, maxLevel);
+			this.coreEnch = new CoreEnch_v1_16_R2(rarity, slotType, enumSlot, getName(), getDisplayName(), getMaxLevel());
 		}
-		else if (version.equals("v1_16_R1")) {
+		else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R1")) {
 			enchLimit = 37;
 			net.minecraft.server.v1_16_R1.EnchantmentSlotType slotType;
 			net.minecraft.server.v1_16_R1.Enchantment.Rarity rarity;
 			net.minecraft.server.v1_16_R1.EnumItemSlot[] enumSlot = null;
-			switch (var1) {
+			switch (getEnchantmentSlot()) {
 			case ARMOR:
 				slotType = net.minecraft.server.v1_16_R1.EnchantmentSlotType.ARMOR;
 				break;
@@ -267,7 +283,7 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			switch (var0) {
+			switch (getRarity()) {
 			case COMMON:
 				rarity = net.minecraft.server.v1_16_R1.Enchantment.Rarity.COMMON;
 				break;
@@ -285,8 +301,8 @@ public class CoreEnchWrapper {
 				break;
 			
 			}
-			List<net.minecraft.server.v1_16_R1.EnumItemSlot> eList = new LinkedList<>();
-			for (ItemSlotEnum e : var2) {
+			List<net.minecraft.server.v1_16_R1.EnumItemSlot> eList = new ArrayList<>();
+			for (ItemSlotEnum e : getItemSlot()) {
 				switch (e) {
 				case CHEST:
 					eList.add(net.minecraft.server.v1_16_R1.EnumItemSlot.CHEST);
@@ -313,33 +329,106 @@ public class CoreEnchWrapper {
 				}
 				enumSlot = eList.toArray(new net.minecraft.server.v1_16_R1.EnumItemSlot[0]);
 			}
-			this.coreEnch = new CoreEnch_v1_16_R1(rarity, slotType, enumSlot, name, displayName, maxLevel);
+			this.coreEnch = new CoreEnch_v1_16_R1(rarity, slotType, enumSlot, getName(), getDisplayName(), getMaxLevel());
 		}
 		else coreEnch = null;
 		holder.addEnchant(this);
 	}
-	public CoreEnchParent getCoreEnch() {
+	public CoreEnch getCoreEnch() {
 		return coreEnch;
 	}
 	public static int getEnchLimit() {
 		return enchLimit;
 	}
 	void setDisabled(boolean d) {
-		if (version.equals("v1_16_R3")) {
+		if (EnchantmentUtils.getNMSVersion().equals("v1_16_R3")) {
 			((CoreEnch_v1_16_R3) coreEnch).setDisabled(d);
-		} else if (version.equals("v1_16_R2")) {
+		} else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R2")) {
 			((CoreEnch_v1_16_R2) coreEnch).setDisabled(d);
-		} else if (version.equals("v1_16_R1")) {
+		} else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R1")) {
 			((CoreEnch_v1_16_R1) coreEnch).setDisabled(d);
 		}
 	}
 	void checkRegisterEnch(boolean resetting, int id) {
-		if (version.equals("v1_16_R3")) {
+		if (EnchantmentUtils.getNMSVersion().equals("v1_16_R3")) {
 			((CoreEnch_v1_16_R3) coreEnch).checkRegisterEnch(resetting, id);
-		} else if (version.equals("v1_16_R2")) {
+		} else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R2")) {
 			((CoreEnch_v1_16_R2) coreEnch).checkRegisterEnch(resetting, id);
-		} else if (version.equals("v1_16_R1")) {
+		} else if (EnchantmentUtils.getNMSVersion().equals("v1_16_R1")) {
 			((CoreEnch_v1_16_R1) coreEnch).checkRegisterEnch(resetting, id);
 		}
+	}
+	public abstract RarityEnum getRarity();
+	public abstract EnchantmentSlotEnum getEnchantmentSlot();
+	public ItemSlotEnum[] getItemSlot() {
+		ItemSlotEnum[] armorSlot = new ItemSlotEnum[] {ItemSlotEnum.CHEST, ItemSlotEnum.FEET, ItemSlotEnum.LEGS, ItemSlotEnum.HEAD};
+		switch (getEnchantmentSlot()) {
+		case ARMOR:
+			return armorSlot;
+		case ARMOR_CHEST:
+			return new ItemSlotEnum[] {ItemSlotEnum.CHEST};
+		case ARMOR_FEET:
+			return new ItemSlotEnum[] {ItemSlotEnum.FEET};
+		case ARMOR_HEAD:
+			return new ItemSlotEnum[] {ItemSlotEnum.HEAD};
+		case ARMOR_LEGS:
+			return new ItemSlotEnum[] {ItemSlotEnum.LEGS};
+		case BOW:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case BREAKABLE:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case CROSSBOW:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case DIGGER:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case FISHING_ROD:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case TRIDENT:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case VANISHABLE:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case WEAPON:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		case WEARABLE:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		default:
+			return new ItemSlotEnum[] {ItemSlotEnum.MAINHAND};
+		}
+	}
+	public abstract String getName();
+	public abstract String getDisplayName();
+	public abstract int getMaxLevel();
+	public void onTakeDamage(EntityDamageByEntityEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onGainExp(PlayerExpChangeEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onFish(PlayerFishEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onAir(EntityAirChangeEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onTargeted(EntityTargetEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onBreakBlock(BlockBreakEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onDealDamage(EntityDamageByEntityEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onDeath(EntityDeathEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onDropItem(EntityDropItemEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onHit(ProjectileHitEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onInteract(EntityInteractEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onPlaceBlock(BlockPlaceEvent event, List<Integer> levels, List<ItemStack> items) {
+	}
+	public void onPotionReceived(EntityPotionEffectEvent event, List<Integer> levels, List<ItemStack> items) {
+		
+	}
+	public void onRegainHealth(EntityRegainHealthEvent event, List<Integer> levels, List<ItemStack> items) {
+		
+	}
+	public void onShootBow(EntityShootBowEvent event, List<Integer> levels, List<ItemStack> items) {
+		
 	}
 }

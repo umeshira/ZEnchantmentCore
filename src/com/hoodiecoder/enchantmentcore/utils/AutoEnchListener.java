@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore;
+package com.hoodiecoder.enchantmentcore.utils;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 //import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.hoodiecoder.enchantmentcore.CoreEnch;
+import com.hoodiecoder.enchantmentcore.CustomEnch;
+import com.hoodiecoder.enchantmentcore.EnchantmentCore;
 
 public class AutoEnchListener implements Listener {
 	private final EnchantmentCore core;
@@ -47,16 +51,16 @@ public class AutoEnchListener implements Listener {
 				enchs = meta.getEnchants();
 			}
 			List<String> currentLore = meta.getLore();
-			Map<Enchantment, Integer> parsedLore = EnchantmentCore.parseLore(currentLore);
+			Map<Enchantment, Integer> parsedLore = EnchantmentUtils.parseLore(currentLore);
 			boolean foundEnch = false;
-			for (CoreEnchWrapper cew : core.getEnchList()) {
-				CoreEnchParent ne = cew.getCoreEnch();
+			for (CustomEnch cew : core.getEnchList()) {
+				CoreEnch ne = cew.getCoreEnch();
 				if (parsedLore == null || (enchs.containsKey(ne.getCraftEnchant()) && !parsedLore.containsKey(ne.getCraftEnchant()))) {
 					foundEnch = true;
 				}
 			}
 			if (!foundEnch) continue;
-			List<String> createdLore = EnchantmentCore.createLore(enchs, currentLore);
+			List<String> createdLore = EnchantmentUtils.createLore(enchs, currentLore);
 			if (currentLore!=null) createdLore.addAll(currentLore);
 			meta.setLore(createdLore);
 			i.setItemMeta(meta);

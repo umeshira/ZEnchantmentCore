@@ -8,7 +8,7 @@ import net.minecraft.server.v1_16_R1.EnumItemSlot;
 import net.minecraft.server.v1_16_R1.IRegistry;
 import net.minecraft.server.v1_16_R1.MinecraftKey;
 
-public class CoreEnch_v1_16_R1 extends Enchantment implements CoreEnchParent {
+public class CoreEnch_v1_16_R1 extends Enchantment implements CoreEnch {
 	private static int nextID = 0;
 	private final int coreID, maxLevel;
 	private final String intName;

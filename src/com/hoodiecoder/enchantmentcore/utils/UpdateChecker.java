@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore;
+package com.hoodiecoder.enchantmentcore.utils;
 
 import org.bukkit.Bukkit;import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Consumer;

@@ -1,6 +1,6 @@
-package com.hoodiecoder.enchantmentcore;
+package com.hoodiecoder.enchantmentcore.utils;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.command.ConsoleCommandSender;
@@ -16,15 +16,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-public abstract class CustomEnchListener implements Listener {
-	private final CoreEnchParent[] listEnchs;
+import com.hoodiecoder.enchantmentcore.CoreEnch;
+import com.hoodiecoder.enchantmentcore.CustomEnch;
+import com.hoodiecoder.enchantmentcore.utils.EnchEnums.ListenerType;
+
+public class CustomEnchListener implements Listener {
+	private final List<CustomEnch> listEnchs = new ArrayList<>();
 	@SuppressWarnings("unused")
 	private final Plugin implementer;
 	@SuppressWarnings("unused")
 	private final ConsoleCommandSender console;
-	public CustomEnchListener(Plugin implementer, CoreEnchParent[] enchs) {
+	public CustomEnchListener(Plugin implementer) {
 		this.implementer = implementer;
-		listEnchs = enchs;
 		console = implementer.getServer().getConsoleSender();
 	}
 	@EventHandler
@@ -97,7 +100,7 @@ public abstract class CustomEnchListener implements Listener {
 		runApplicableTypes(event);
 	}
 	private void runApplicableTypes(Event event) {
-		List<ListenerType> ltypes = new LinkedList<>();
+		List<ListenerType> ltypes = new ArrayList<>();
 		for (ListenerType lt : ListenerType.values()) {
 			if (lt.getEventClass().isInstance(event)) {
 				ltypes.add(lt);
@@ -156,8 +159,9 @@ public abstract class CustomEnchListener implements Listener {
 		}
 		return entityPlayer;
 	}
-	private Object[] getApplicableItems(CoreEnchParent ce, PlayerInventory playerInv) {
+	private Object[] getApplicableItems(CustomEnch cse, PlayerInventory playerInv) {
 		Object[] applicableItems;
+		CoreEnch ce = cse.getCoreEnch();
 		if (ce.isDisabled()) return null;
 		Enchantment ench = ce.getCraftEnchant();
 		switch (ench.getItemTarget()) {
@@ -196,7 +200,7 @@ public abstract class CustomEnchListener implements Listener {
 		case ARMOR:
 		case WEARABLE:
 			ItemStack[] armorArr = playerInv.getArmorContents();
-			List<ItemStack> armor = new LinkedList<ItemStack>();
+			List<ItemStack> armor = new ArrayList<ItemStack>();
 			for (ItemStack a : armorArr) {
 				if (a != null && a.containsEnchantment(ench) && ench.canEnchantItem(a)) {
 					armor.add(a);
@@ -215,7 +219,7 @@ public abstract class CustomEnchListener implements Listener {
 		case TRIDENT:
 		case WEAPON:
 		case BREAKABLE:
-			List<ItemStack> itemS = new LinkedList<>();
+			List<ItemStack> itemS = new ArrayList<>();
 			ItemStack itemMain = playerInv.getItemInMainHand();
 			ItemStack itemOff = playerInv.getItemInOffHand();
 			if (ench.canEnchantItem(itemMain) && itemMain.containsEnchantment(ench)) {
@@ -238,23 +242,77 @@ public abstract class CustomEnchListener implements Listener {
 		}
 		return applicableItems;
 	}
-	private void callEvents(CoreEnchParent[] listEnchs, PlayerInventory playerInv, Event event, ListenerType ltype) {
-		for (CoreEnchParent ce : listEnchs) {
-			Enchantment ench = ce.getCraftEnchant();
+	private void callEvents(List<CustomEnch> listEnchs, PlayerInventory playerInv, Event event, ListenerType ltype) {
+		for (CustomEnch ce : listEnchs) {
+			Enchantment ench = ce.getCoreEnch().getCraftEnchant();
 			Object[] applicableItems = getApplicableItems(ce, playerInv);
 			if (applicableItems == null) {
 				continue;
 			} else {
-				List<Integer> levels = new LinkedList<>();
-				List<ItemStack> items = new LinkedList<>();
+				List<Integer> levels = new ArrayList<>();
+				List<ItemStack> items = new ArrayList<>();
 				for (Object o : applicableItems) {
 					items.add((ItemStack)o);
 					levels.add(((ItemStack)o).getEnchantmentLevel(ench));
 				}
-				onCustomEvent(event, ce, levels, items, ltype);
+				switch (ltype) {
+				case ENTITY_AIR:
+					ce.onAir((org.bukkit.event.entity.EntityAirChangeEvent) event, levels, items);
+					break;
+				case ENTITY_BECOME_TARGETED:
+					ce.onTargeted((org.bukkit.event.entity.EntityTargetEvent) event, levels, items);
+					break;
+				case ENTITY_BREAK_BLOCK:
+					ce.onBreakBlock((org.bukkit.event.block.BlockBreakEvent) event, levels, items);
+					break;
+				case ENTITY_DEAL_DAMAGE:
+					ce.onDealDamage((org.bukkit.event.entity.EntityDamageByEntityEvent) event, levels, items);
+					break;
+				case ENTITY_DEATH:
+					ce.onDeath((org.bukkit.event.entity.EntityDeathEvent) event, levels, items);
+					break;
+				case ENTITY_DROP:
+					ce.onDropItem((org.bukkit.event.entity.EntityDropItemEvent) event, levels, items);
+					break;
+				case ENTITY_HIT_PROJECTILE:
+					ce.onHit((org.bukkit.event.entity.ProjectileHitEvent) event, levels, items);
+					break;
+				case ENTITY_INTERACT:
+					ce.onInteract((org.bukkit.event.entity.EntityInteractEvent) event, levels, items);
+					break;
+				case ENTITY_PLACE_BLOCK:
+					ce.onPlaceBlock((org.bukkit.event.block.BlockPlaceEvent) event, levels, items);
+					break;
+				case ENTITY_POTION:
+					ce.onPotionReceived((org.bukkit.event.entity.EntityPotionEffectEvent) event, levels, items);
+					break;
+				case ENTITY_REGAIN_HEALTH:
+					ce.onRegainHealth((org.bukkit.event.entity.EntityRegainHealthEvent) event, levels, items);
+					break;
+				case ENTITY_SHOOT_BOW:
+					ce.onShootBow((org.bukkit.event.entity.EntityShootBowEvent) event, levels, items);
+					break;
+				case ENTITY_TAKE_DAMAGE:
+					ce.onTakeDamage((org.bukkit.event.entity.EntityDamageByEntityEvent) event, levels, items);
+					break;
+				case PLAYER_EXP_EVENT:
+					ce.onGainExp((org.bukkit.event.player.PlayerExpChangeEvent) event, levels, items);
+					break;
+				case PLAYER_FISH_EVENT:
+					ce.onFish((org.bukkit.event.player.PlayerFishEvent) event, levels, items);
+					break;
+				default:
+					break;
+				
+				}
 			}
 		}
 		
 	}
-	public abstract void onCustomEvent(Event event, CoreEnchParent ench, List<Integer> levels, List<ItemStack> items, ListenerType ltype);
+	public void addEnch(CustomEnch ench) {
+		if (!listEnchs.contains(ench)) {
+			listEnchs.add(ench);
+		}
+	}
+	//public abstract void onCustomEvent(Event event, CoreEnch ench, List<Integer> levels, List<ItemStack> items, ListenerType ltype);
 }

@@ -2,7 +2,7 @@ package com.hoodiecoder.enchantmentcore;
 
 import org.bukkit.enchantments.Enchantment;
 
-public interface CoreEnchParent {
+public interface CoreEnch {
 	String getDisplayName();
 	int getCoreID();
 	boolean isDisabled();

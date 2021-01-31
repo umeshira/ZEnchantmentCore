@@ -1,4 +1,4 @@
-package com.hoodiecoder.enchantmentcore;
+package com.hoodiecoder.enchantmentcore.utils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +12,8 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.hoodiecoder.enchantmentcore.EnchantmentCore;
 
 public class ItemEnchantListener implements Listener {
 	@SuppressWarnings("unused")
@@ -29,7 +31,7 @@ public class ItemEnchantListener implements Listener {
 		if (lore == null) {
 			lore = new LinkedList<String>();
 		}
-		List<String> createdLore = EnchantmentCore.createLore(map, lore);
+		List<String> createdLore = EnchantmentUtils.createLore(map, lore);
 		if (lore != null) createdLore.addAll(lore);
 		meta.setLore(createdLore);
 		event.getItem().setItemMeta(meta);
@@ -44,7 +46,7 @@ public class ItemEnchantListener implements Listener {
 		if (lore == null) {
 			lore = new LinkedList<String>();
 		}
-		List<String> createdLore = EnchantmentCore.createLore(map, lore);
+		List<String> createdLore = EnchantmentUtils.createLore(map, lore);
 		if (lore != null) createdLore.addAll(lore);
 		meta.setLore(createdLore);
 		result.setItemMeta(meta);
