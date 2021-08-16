@@ -28,9 +28,7 @@ public class LootGenerateListener implements Listener {
 	public void onGenerate(LootGenerateEvent e) {
 		List<ItemStack> loot = e.getLoot();
 		for (ItemStack i : loot) {
-			int index = loot.indexOf(i);
 			addEnchantToItem(generator, e.getEntity(), e.getLootTable(), i);
-			loot.set(index, i);
 		}
 	}
 	

@@ -25,6 +25,7 @@ import org.bukkit.loot.LootTables;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
+import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 
 import static com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType.*;
 
@@ -272,7 +273,7 @@ public class EnchantmentGenerator {
 		}
 		for (CustomEnch e : CustomEnch.values()) {
 			if (e.isDisabled()) continue;
-			if (((!ENCHANTED_BOOK.contains(mat) && e.canEnchantItem(item)) || ENCHANTED_BOOK.contains(mat)) && (allowTreasure ? true : !e.isTreasure())) {
+			if (e.getRarity() != Rarity.UNFINDABLE && ((!ENCHANTED_BOOK.contains(mat) && e.canEnchantItem(item)) || ENCHANTED_BOOK.contains(mat)) && (allowTreasure ? true : !e.isTreasure())) {
 				int lvl = r.nextInt(e.getMaxLevel())+1;
 				possibilities.put(e, lvl);
 			}
