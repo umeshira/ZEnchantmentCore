@@ -1,10 +1,10 @@
-package com.hoodiecoder.enchantmentcore.utils;
+package com.hoodiecoder.enchantmentcore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,12 +16,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
-import com.hoodiecoder.enchantmentcore.CoreEnch;
-import com.hoodiecoder.enchantmentcore.CustomEnch;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.ListenerType;
 
+/**
+ * Event listener responsible for sending events to custom enchantments for handling.
+ */
 public class CustomEnchListener implements Listener {
-	private final List<CustomEnch> listEnchs = new ArrayList<>();
 	@SuppressWarnings("unused")
 	private final Plugin implementer;
 	@SuppressWarnings("unused")
@@ -37,7 +37,7 @@ public class CustomEnchListener implements Listener {
 	}
 	@EventHandler
 	public void onEvent(org.bukkit.event.entity.EntityAirChangeEvent event) {
-		//runApplicableTypes(event); Disabled until seen as necessary
+		runApplicableTypes(event);
 		
 	}
 	@EventHandler
@@ -119,7 +119,7 @@ public class CustomEnchListener implements Listener {
 		}
 		Player player = (Player) entityPlayer;
 		PlayerInventory playerInv = player.getInventory();
-		callEvents(listEnchs, playerInv, event, ltype);
+		callEvents(Arrays.asList(CustomEnch.values()), playerInv, event, ltype);
 	}
 	private static Entity getEntityFromType(ListenerType ltype, Event event) {
 		Entity entityPlayer = null;
@@ -159,40 +159,38 @@ public class CustomEnchListener implements Listener {
 		}
 		return entityPlayer;
 	}
-	private Object[] getApplicableItems(CustomEnch cse, PlayerInventory playerInv) {
-		Object[] applicableItems;
-		CoreEnch ce = cse.getCoreEnch();
-		if (ce.isDisabled()) return null;
-		Enchantment ench = ce.getCraftEnchant();
+	private ItemStack[] getApplicableItems(CustomEnch ench, PlayerInventory playerInv) {
+		ItemStack[] applicableItems;
+		if (ench.isDisabled()) return null;
 		switch (ench.getItemTarget()) {
 		case ARMOR_FEET:
 			ItemStack feet = playerInv.getBoots();
-			if (ench.canEnchantItem(feet) && feet.containsEnchantment(ench)) {
-			applicableItems = new Object[]{feet};
+			if (ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
+			applicableItems = new ItemStack[]{feet};
 			} else {
 				applicableItems = null;
 			}
 			break;
 		case ARMOR_HEAD:
 			ItemStack head = playerInv.getHelmet();
-			if (ench.canEnchantItem(head) && head.containsEnchantment(ench)) {
-				applicableItems = new Object[]{head};
+			if (ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
+				applicableItems = new ItemStack[]{head};
 				} else {
 					applicableItems = null;
 				}
 			break;
 		case ARMOR_LEGS:
 			ItemStack legs = playerInv.getLeggings();
-			if (ench.canEnchantItem(legs) && legs.containsEnchantment(ench)) {
-				applicableItems = new Object[]{legs};
+			if (ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
+				applicableItems = new ItemStack[]{legs};
 				} else {
 					applicableItems = null;
 				}
 			break;
 		case ARMOR_TORSO:
 			ItemStack chest = playerInv.getChestplate();
-			if (ench.canEnchantItem(chest) && chest.containsEnchantment(ench)) {
-				applicableItems = new Object[]{chest};
+			if (ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
+				applicableItems = new ItemStack[]{chest};
 				} else {
 					applicableItems = null;
 				}
@@ -202,14 +200,14 @@ public class CustomEnchListener implements Listener {
 			ItemStack[] armorArr = playerInv.getArmorContents();
 			List<ItemStack> armor = new ArrayList<ItemStack>();
 			for (ItemStack a : armorArr) {
-				if (a != null && a.containsEnchantment(ench) && ench.canEnchantItem(a)) {
+				if (a != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
 					armor.add(a);
 				}
 			}
 			if (armor.isEmpty()) {
 				applicableItems = null;
 			} else {
-				applicableItems = armor.toArray();
+				applicableItems = armor.toArray(new ItemStack[0]);
 			}
 			break;
 		case BOW:
@@ -222,20 +220,18 @@ public class CustomEnchListener implements Listener {
 			List<ItemStack> itemS = new ArrayList<>();
 			ItemStack itemMain = playerInv.getItemInMainHand();
 			ItemStack itemOff = playerInv.getItemInOffHand();
-			if (ench.canEnchantItem(itemMain) && itemMain.containsEnchantment(ench)) {
+			if (ench.canEnchantItem(itemMain) && itemMain.getItemMeta().hasEnchant(ench)) {
 				itemS.add(itemMain);
 			}
-			if (ench.canEnchantItem(itemOff) && itemOff.containsEnchantment(ench)) {
+			if (ench.canEnchantItem(itemOff) && itemOff.getItemMeta().hasEnchant(ench)) {
 				itemS.add(itemOff);
 			}
 			if (itemS.isEmpty()) {
 				applicableItems = null;
 			} else {
-				applicableItems = itemS.toArray();
+				applicableItems = itemS.toArray(new ItemStack[0]);
 			}
 			break;
-		/*case VANISHABLE:
-			break;*/
 		default:
 			applicableItems = null;
 			break;	
@@ -244,16 +240,15 @@ public class CustomEnchListener implements Listener {
 	}
 	private void callEvents(List<CustomEnch> listEnchs, PlayerInventory playerInv, Event event, ListenerType ltype) {
 		for (CustomEnch ce : listEnchs) {
-			Enchantment ench = ce.getCoreEnch().getCraftEnchant();
-			Object[] applicableItems = getApplicableItems(ce, playerInv);
+			ItemStack[] applicableItems = getApplicableItems(ce, playerInv);
 			if (applicableItems == null) {
 				continue;
 			} else {
 				List<Integer> levels = new ArrayList<>();
 				List<ItemStack> items = new ArrayList<>();
-				for (Object o : applicableItems) {
-					items.add((ItemStack)o);
-					levels.add(((ItemStack)o).getEnchantmentLevel(ench));
+				for (ItemStack o : applicableItems) {
+					items.add(o);
+					levels.add(o.getItemMeta().getEnchantLevel(ce));
 				}
 				switch (ltype) {
 				case ENTITY_AIR:
@@ -309,10 +304,4 @@ public class CustomEnchListener implements Listener {
 		}
 		
 	}
-	public void addEnch(CustomEnch ench) {
-		if (!listEnchs.contains(ench)) {
-			listEnchs.add(ench);
-		}
-	}
-	//public abstract void onCustomEvent(Event event, CoreEnch ench, List<Integer> levels, List<ItemStack> items, ListenerType ltype);
 }

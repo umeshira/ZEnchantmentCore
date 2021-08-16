@@ -1,11 +1,28 @@
 package com.hoodiecoder.enchantmentcore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.plugin.Plugin;
+
+/**
+ * <p>Holder responsible for holding pending custom enchantments for registration.</p>
+ * <p>The holder must be passed to each <code>CustomEnch</code> constructor in order for the enchantments to be added to the holder. For example:</p>
+ * <pre>
+ * EnchantmentHolder holder = new EnchantmentHolder(plugin);
+ * CustomEnch myEnch = new MyCustomEnch(holder);
+ * </pre>
+ */
 public class EnchantmentHolder {
 private final List<CustomEnch> holder;
-public EnchantmentHolder() {
+private final Plugin plugin;
+/**
+ * Creates a new <code>EnchantmentHolder</code> object with a plugin owner.
+ * @param plugin The plugin responsible for the holder
+ */
+public EnchantmentHolder(Plugin plugin) {
+	this.plugin = plugin;
 	holder = new ArrayList<>();
 }
 boolean addEnchant(CustomEnch ench) {
@@ -24,11 +41,26 @@ boolean removeEnchant(CustomEnch ench) {
 		return false;
 	}
 }
+/**
+ * Gets a list of all enchants in the holder.
+ * @return List of all held enchants
+ */
+public List<CustomEnch> getEnchants() {
+	return Collections.unmodifiableList(holder);
+}
+/**
+ * Registers all currently held enchants as pending registration.
+ */
 public void registerPendingEnchants() {
 	for (CustomEnch cew : holder) {
-		if (!EnchantmentCore.getInstance().getEnchList().contains(cew)) {
-			EnchantmentCore.getInstance().addEnchant(cew);
-		}
+		cew.addToPending();
 	}
+}
+/** 
+ * Gets the owner plugin of this holder.
+ * @return The plugin responsible for the holder
+ */
+public Plugin getOwnerPlugin() {
+	return plugin;
 }
 }
