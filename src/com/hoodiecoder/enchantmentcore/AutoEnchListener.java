@@ -2,7 +2,6 @@ package com.hoodiecoder.enchantmentcore;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
@@ -12,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.GrindstoneInventory;
 //import org.bukkit.event.inventory.InventoryEvent;
 //import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -21,19 +19,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 //import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
 
 /**
- * Event listener responsible for automatically applying enchantment lore and generating loot tables.
+ * Event listener responsible for automatically applying enchantment lore.
  */
 public class AutoEnchListener implements Listener {
 	private final EnchantmentCore core;
-	private final EnchantmentGenerator generator;
-	public AutoEnchListener(EnchantmentCore c, EnchantmentGenerator generator) {
+	public AutoEnchListener(EnchantmentCore c) {
 		core = c;
-		this.generator = generator;
 	}
 	
 	@EventHandler
@@ -53,43 +47,9 @@ public class AutoEnchListener implements Listener {
 	public void onInteract(InventoryClickEvent e) {
 		addAllLore(e.getInventory());
 	}
-	@EventHandler
-	public void onGenerate(LootGenerateEvent e) {
-		List<ItemStack> loot = e.getLoot();
-		for (ItemStack i : loot) {
-			int index = loot.indexOf(i);
-			ItemMeta iMeta = i.getItemMeta();
-			if (!(iMeta instanceof EnchantmentStorageMeta) && iMeta.hasEnchants()) {
-				Map<Enchantment, Integer> enchMap = iMeta.getEnchants();
-				for (Entry<Enchantment, Integer> entry : enchMap.entrySet()) {
-					iMeta.removeEnchant(entry.getKey());
-				}
-				EnchantmentInformation enchInfo = generator.getLootOffer(i, e.getEntity(), e.getLootTable(), enchMap.size(), true);
-				for (Entry<Enchantment, Integer> ench : enchInfo.toMap().entrySet()) {
-					iMeta.addEnchant(ench.getKey(), ench.getValue(), false);
-				}
-				i.setItemMeta(iMeta);
-			} else if (iMeta instanceof EnchantmentStorageMeta && ((EnchantmentStorageMeta) iMeta).hasStoredEnchants()) {
-				EnchantmentStorageMeta storageMeta = (EnchantmentStorageMeta) iMeta;
-
-				Map<Enchantment, Integer> enchMap = storageMeta.getStoredEnchants();
-				for (Entry<Enchantment, Integer> entry : enchMap.entrySet()) {
-					storageMeta.removeStoredEnchant(entry.getKey());	
-				}
-				EnchantmentInformation enchInfo = generator.getLootOffer(i, e.getEntity(), e.getLootTable(), enchMap.size(), true);
-				for (Entry<Enchantment, Integer> ench : enchInfo.toMap().entrySet()) {
-					storageMeta.addStoredEnchant(ench.getKey(), ench.getValue(), false);
-				}
-				i.setItemMeta(storageMeta);
-			} else {
-				continue;
-			}
-			loot.set(index, i);
-		}
-	}
 	private void addAllLore(Inventory inv) {
 		addLoreLoop(inv.getContents());
-		if (inv.getType() == InventoryType.GRINDSTONE) {
+		if (EnchantmentUtils.getGenerator().getMinecraftVersion() >= 14 && inv.getType() == InventoryType.GRINDSTONE) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(core, new Runnable() {
 				@Override
 				public void run() {

@@ -339,8 +339,10 @@ public static Map<Enchantment, Integer> getValidSacrificeEnchants(ItemStack item
 	Map<Enchantment, Integer> result = new HashMap<>();
 	sacrificeLoop:
 	for (Entry<Enchantment, Integer> sacrificeEntry : sacrifice.entrySet()) {
+		if (allowIllegal ? false : (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !sacrificeEntry.getKey().canEnchantItem(itemToEnchant)))
+			continue sacrificeLoop;
 		for (Entry<Enchantment, Integer> targetEntry : target.entrySet()) {
-			if (allowIllegal ? false : (targetEntry.getKey().conflictsWith(sacrificeEntry.getKey()) || !(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !sacrificeEntry.getKey().canEnchantItem(itemToEnchant)))
+			if (allowIllegal ? false : (targetEntry.getKey().conflictsWith(sacrificeEntry.getKey())))
 				continue sacrificeLoop;
 		}
 		result.put(sacrificeEntry.getKey(), sacrificeEntry.getValue());
@@ -389,19 +391,56 @@ public static int getUnitRepairNumber(ItemStack target, ItemStack item) {
 	return -1;
 }
 /**
- * Gets the anvil repair cost of the specified item.
+ * Gets the anvil uses of the specified item.
  * @param item	The item to test
- * @return		The anvil repair cost of the item
+ * @return		The anvil use number of the item
  */
-public static int getAnvilCost(ItemStack item) {
+public static int getAnvilUses(ItemStack item) {
 	try {
 		Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		return (int)nmsItem.getClass().getMethod("getRepairCost").invoke(nmsItem);
+		Object nbtTag = nmsItem.getClass().getMethod("getTag").invoke(nmsItem);
+		if (nbtTag != null && (boolean) nbtTag.getClass().getMethod("hasKey", String.class).invoke(nbtTag, "AnvilUses")) {
+			int val = (int) nbtTag.getClass().getMethod("getInt", String.class).invoke(nbtTag, "AnvilUses");
+			return val;
+		} else {
+			return 0;
+		}
 	} catch (Exception e) {
 		e.printStackTrace();
 		return 0;
 	}
 }
+
+/**
+ * Gets the anvil cost of the specified item.
+ * @param item	The item to test
+ * @return		The anvil cost of the item
+ */
+public static int getAnvilCost(ItemStack item) {
+	return (int) Math.pow(2, getAnvilUses(item)) - 1;
+}
+
+/**
+ * Sets the number of anvil uses to the specified number on a copy of the given item.
+ * @param item	The item to test
+ * @param num	Number to set to
+ * @return		A copy of the item with the modified data.
+ */
+public static ItemStack setAnvilUses(ItemStack item, int num) {
+	try {
+		Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+		Object nbtTag = nmsItem.getClass().getMethod("getTag").invoke(nmsItem);
+		if (nbtTag != null) {
+			nbtTag.getClass().getMethod("setInt", String.class, int.class).invoke(nbtTag, "AnvilUses", num);
+			nmsItem.getClass().getMethod("setTag", nbtTag.getClass()).invoke(nmsItem, nbtTag);
+			return (ItemStack) getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	return item.clone();
+}
+
 /**
  * Gets the section of configuration containing enchantment generator settings.
  * @return	The enchantment generator configuration section

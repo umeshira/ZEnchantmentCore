@@ -77,11 +77,18 @@ public void onEnable() {
 	instance = getPlugin(this.getClass());
 	reloadableEnable(false);
 	ItemEnchantListener iel = new ItemEnchantListener(this, coreGenerator);
-	AutoEnchListener ael = new AutoEnchListener(this, coreGenerator);
+	AutoEnchListener ael = new AutoEnchListener(this);
 	customListener = new CustomEnchListener(this);
 	m.registerEvents(iel, this);
 	m.registerEvents(ael, this);
 	m.registerEvents(customListener, this);
+	if (version >= 15) {
+		LootGenerateListener lgl = new LootGenerateListener(coreGenerator);
+		m.registerEvents(lgl, this);
+	} else {
+		LegacyLootGenerateListener lgl = new LegacyLootGenerateListener(coreGenerator);
+		m.registerEvents(lgl, this);
+	}
 	new UpdateChecker(this, 88310).getVersion(version -> {
 		if (!this.getDescription().getVersion().equalsIgnoreCase(version.substring(1))) {
 			String str = ChatColor.DARK_AQUA + "ZEnchantmentCore » " + ChatColor.GRAY + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";

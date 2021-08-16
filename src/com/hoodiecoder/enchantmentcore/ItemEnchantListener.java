@@ -69,22 +69,23 @@ public class ItemEnchantListener implements Listener {
 		if (lore == null) {
 			lore = new LinkedList<String>();
 		}
-		List<String> createdLore = EnchantmentUtils.createLore(map, lore);
-		meta.setLore(createdLore);
 		event.getItem().setItemMeta(meta);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(core, new Runnable() {
 			@Override
 			public void run() {
 				ItemStack item = event.getInventory().getItem(0);
+				ItemMeta iMeta = item.getItemMeta();
 				if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
-					EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta)item.getItemMeta();
+					EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta)iMeta;
 					event.getEnchantsToAdd().forEach((ench,lvl)->{
 						if (ench instanceof CustomEnch) {
 							eMeta.addStoredEnchant(ench, lvl, true);
 						}
 					});
-					item.setItemMeta(eMeta);
 				}
+				List<String> createdLore = EnchantmentUtils.createLore(map, item.getItemMeta().getLore());
+				iMeta.setLore(createdLore);
+				item.setItemMeta(iMeta);
 			}
 		}); // schedule needed since Minecraft will not apply custom enchantments to books (for some reason)
 	}
@@ -123,7 +124,10 @@ public class ItemEnchantListener implements Listener {
 				else {
 					repair += EnchantmentUtils.getAnvilCost(secondSlot);
 				}
-				if (initDamage != dFirst.getDamage()) canApply = true;
+				if (firstSlot.getType() == secondSlot.getType() && initDamage > 0)
+					repair += 2;
+				if (initDamage != dFirst.getDamage())
+					canApply = true;
 			}
 			if (firstSlot.getType() == secondSlot.getType() || secondMeta instanceof EnchantmentStorageMeta) {
 				boolean allowIllegal;
@@ -162,6 +166,7 @@ public class ItemEnchantListener implements Listener {
 		}
 		final int repairCost;
 		repairCost = repair;
+		result = EnchantmentUtils.setAnvilUses(result, Math.max(EnchantmentUtils.getAnvilUses(firstSlot), EnchantmentUtils.getAnvilUses(secondSlot)) + 1);
 		event.setResult(result);
 		core.getServer().getScheduler().runTask(core, () -> {
 			event.getInventory().setRepairCost(repairCost);
@@ -171,5 +176,4 @@ public class ItemEnchantListener implements Listener {
 			}
 		});
 	}
-	
 }
