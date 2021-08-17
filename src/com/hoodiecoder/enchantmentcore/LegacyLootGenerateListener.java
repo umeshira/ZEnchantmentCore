@@ -9,6 +9,9 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.loot.LootTable;
 
+/**
+ * Event listener responsible for generating loot tables for versions 1.14 and below.
+ */
 public class LegacyLootGenerateListener implements Listener {
 	private final EnchantmentGenerator generator;
 	public LegacyLootGenerateListener(EnchantmentGenerator generator) {

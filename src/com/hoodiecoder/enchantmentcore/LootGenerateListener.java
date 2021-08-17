@@ -17,7 +17,7 @@ import org.bukkit.loot.LootTable;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 
 /**
- * Event responsible for generating loot tables.
+ * Event listener responsible for generating loot tables for versions 1.15 and above.
  */
 public class LootGenerateListener implements Listener {
 	private final EnchantmentGenerator generator;
