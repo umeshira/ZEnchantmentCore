@@ -18,27 +18,16 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 16
+        distribution: 'adopt'
     - name: Unshallow
       run: git fetch --unshallow --quiet
     - name: Build with Maven
-      run: mvn -B package
+      run: mvn -B install javadoc:aggregate-no-fork
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
         name: "ZEnchantmentCore"
         path: "./target/ZEnchantmentCore.jar"
-  javadocs:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 16
-      uses: actions/setup-java@v2
-      with:
-        java-version: 16
-    - name: Unshallow
-      run: git fetch --unshallow --quiet
-    - name: Generate Javadocs
-      run: mvn install javadoc:aggregate-no-fork
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
