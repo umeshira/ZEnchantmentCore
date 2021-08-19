@@ -1,0 +1,28 @@
+name: ${project.name}
+main: com.hoodiecoder.enchantmentcore.EnchantmentCore
+version: ${project.version}
+api-version: 1.13
+
+commands:
+    zenchantment:
+      description: Main ZEnchantmentCore command.
+      usage: /zenchantment [args]
+    ze:
+      description: Main ZEnchantmentCore command.
+      usage: /ze [args]
+    enchant:
+      description: Main enchantment command (overrides minecraft command).
+      usage: /enchant [args]
+permissions:
+  zenchantmentcore.help:
+    description: Allows player to use /ze help.
+    default: true
+  zenchantmentcore.util:
+    description: Allows player to use /ze utility commands.
+    default: op
+  zenchantmentcore.reload:
+    description: Allows player to use the /ze reload command.
+    default: op
+  zenchantmentcore.enchant:
+    description: Allows player to enchant with /ze enchant.
+    default: op
