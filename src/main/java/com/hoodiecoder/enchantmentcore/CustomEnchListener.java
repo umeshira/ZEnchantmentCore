@@ -178,53 +178,43 @@ public class CustomEnchListener implements Listener {
     }
 
     private ItemStack[] getApplicableItems(CustomEnch ench, PlayerInventory playerInv) {
-        ItemStack[] applicableItems;
-        if (ench.isDisabled()) return null;
+        ItemStack[] applicableItems = new ItemStack[0];
+        if (ench.isDisabled()) return applicableItems;
         switch (ench.getItemTarget()) {
             case ARMOR_FEET:
                 ItemStack feet = playerInv.getBoots();
                 if (ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{feet};
-                } else {
-                    applicableItems = null;
                 }
                 break;
             case ARMOR_HEAD:
                 ItemStack head = playerInv.getHelmet();
                 if (ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{head};
-                } else {
-                    applicableItems = null;
                 }
                 break;
             case ARMOR_LEGS:
                 ItemStack legs = playerInv.getLeggings();
                 if (ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{legs};
-                } else {
-                    applicableItems = null;
                 }
                 break;
             case ARMOR_TORSO:
                 ItemStack chest = playerInv.getChestplate();
                 if (ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{chest};
-                } else {
-                    applicableItems = null;
                 }
                 break;
             case ARMOR:
             case WEARABLE:
                 ItemStack[] armorArr = playerInv.getArmorContents();
-                List<ItemStack> armor = new ArrayList<ItemStack>();
+                List<ItemStack> armor = new ArrayList<>();
                 for (ItemStack a : armorArr) {
                     if (a != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
                         armor.add(a);
                     }
                 }
-                if (armor.isEmpty()) {
-                    applicableItems = null;
-                } else {
+                if (!armor.isEmpty()) {
                     applicableItems = armor.toArray(new ItemStack[0]);
                 }
                 break;
@@ -244,14 +234,11 @@ public class CustomEnchListener implements Listener {
                 if (ench.canEnchantItem(itemOff) && itemOff.getItemMeta().hasEnchant(ench)) {
                     itemS.add(itemOff);
                 }
-                if (itemS.isEmpty()) {
-                    applicableItems = null;
-                } else {
+                if (!itemS.isEmpty()) {
                     applicableItems = itemS.toArray(new ItemStack[0]);
                 }
                 break;
             default:
-                applicableItems = null;
                 break;
         }
         return applicableItems;
@@ -260,9 +247,7 @@ public class CustomEnchListener implements Listener {
     private void callEvents(List<CustomEnch> listEnchs, PlayerInventory playerInv, Event event, ListenerType ltype) {
         for (CustomEnch ce : listEnchs) {
             ItemStack[] applicableItems = getApplicableItems(ce, playerInv);
-            if (applicableItems == null) {
-                continue;
-            } else {
+            if (applicableItems.length > 0) {
                 List<Integer> levels = new ArrayList<>();
                 List<ItemStack> items = new ArrayList<>();
                 for (ItemStack o : applicableItems) {
@@ -317,7 +302,6 @@ public class CustomEnchListener implements Listener {
                         break;
                     default:
                         break;
-
                 }
             }
         }

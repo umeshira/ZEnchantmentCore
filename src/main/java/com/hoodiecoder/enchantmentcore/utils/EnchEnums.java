@@ -136,7 +136,10 @@ public class EnchEnums {
         MULTISHOT(20, 0, 50, 0), QUICK_CHARGE(12, 20, 12 + 50, 20), PIERCING(1, 10, 50, 0), MENDING(0, 25, 50, 25), VANISHING_CURSE(25, 0, 50, 0),
         PLACEHOLDER(0, 0, 0, 0);
 
-        private final int minM, minB, maxM, maxB;
+        private final int minM;
+        private final int minB;
+        private final int maxM;
+        private final int maxB;
 
         EnchConstants(int minB, int minM, int maxB, int maxM) {
             this.minM = minM;
@@ -284,10 +287,10 @@ public class EnchEnums {
         MaterialType() {
             if (this.toString().equals("NETHERITE_ARMOR") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16) {
                 this.materials = Arrays.asList(NETHERITE_HELMET, NETHERITE_CHESTPLATE, NETHERITE_LEGGINGS, NETHERITE_BOOTS);
-                this.repairs = Arrays.asList(NETHERITE_INGOT);
+                this.repairs = Collections.singletonList(NETHERITE_INGOT);
             } else if (this.toString().equals("NETHERITE") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16) {
                 this.materials = Arrays.asList(NETHERITE_SWORD, NETHERITE_PICKAXE, NETHERITE_AXE, NETHERITE_SHOVEL, NETHERITE_HOE);
-                this.repairs = Arrays.asList(NETHERITE_INGOT);
+                this.repairs = Collections.singletonList(NETHERITE_INGOT);
             } else {
                 this.materials = new ArrayList<>();
                 this.repairs = new ArrayList<>();

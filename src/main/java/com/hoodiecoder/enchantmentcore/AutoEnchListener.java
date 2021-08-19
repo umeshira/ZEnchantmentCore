@@ -51,14 +51,11 @@ public class AutoEnchListener implements Listener {
     private void addAllLore(Inventory inv) {
         addLoreLoop(inv.getContents());
         if (EnchantmentUtils.getGenerator().getMinecraftVersion() >= 14 && inv.getType() == InventoryType.GRINDSTONE) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(core, new Runnable() {
-                @Override
-                public void run() {
-                    GrindstoneInventory gInv = (GrindstoneInventory) inv;
-                    ItemStack[] grindstoneItems = new ItemStack[]{gInv.getItem(2)};
-                    addLoreLoop(grindstoneItems);
-                    gInv.setItem(2, grindstoneItems[0]);
-                }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(core, () -> {
+                GrindstoneInventory gInv = (GrindstoneInventory) inv;
+                ItemStack[] grindstoneItems = new ItemStack[]{gInv.getItem(2)};
+                addLoreLoop(grindstoneItems);
+                gInv.setItem(2, grindstoneItems[0]);
             }); // schedule needed or Minecraft will override the set item
         }
     }
@@ -77,7 +74,7 @@ public class AutoEnchListener implements Listener {
             }
             List<String> currentLore = meta.getLore();
             List<String> createdLore = EnchantmentUtils.createLore(enchs, currentLore);
-            if (createdLore == null || !createdLore.equals(currentLore)) {
+            if (!createdLore.equals(currentLore)) {
                 meta.setLore(createdLore);
                 i.setItemMeta(meta);
             }

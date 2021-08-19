@@ -166,7 +166,7 @@ public class EnchantmentCore extends JavaPlugin {
                                 break;
                             } else {
                                 if (sender.hasPermission("zenchantmentcore.util")) {
-                                    if (player.getInventory().getItemInMainHand().getType() == null || player.getInventory().getItemInMainHand().getType() == org.bukkit.Material.AIR) {
+                                    if (player.getInventory().getItemInMainHand().getType() == org.bukkit.Material.AIR) {
                                         sender.sendMessage(messagePrefix + "Cannot check for empty hand.");
                                         break;
                                     } else {
@@ -366,6 +366,7 @@ public class EnchantmentCore extends JavaPlugin {
                             for (CustomEnch ench : CustomEnch.values())
                                 COMMANDS.add(ench.getKey().getKey().toLowerCase());
                             StringUtil.copyPartialMatches(args[1], COMMANDS, completions);
+                            break;
                         case "reload":
                         case "check":
                         case "list":

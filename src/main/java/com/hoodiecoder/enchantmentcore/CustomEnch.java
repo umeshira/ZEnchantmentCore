@@ -70,7 +70,7 @@ public abstract class CustomEnch extends Enchantment {
     }
 
     static void batchRegister(List<CustomEnch> list) {
-        list.sort(Comparator.comparingInt(ce -> ce.getPriority()));
+        list.sort(Comparator.comparingInt(CustomEnch::getPriority));
         Collections.reverse(list);
         for (CustomEnch ce : list) {
             ce.registerEnchantment();

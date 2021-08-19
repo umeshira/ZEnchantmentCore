@@ -104,7 +104,7 @@ public class EnchantmentUtils {
      * @return Lore created from the given enchantments
      */
     public static List<String> createLore(Map<Enchantment, Integer> enchs, List<String> currentLore) {
-        List<String> lore = new LinkedList<String>();
+        List<String> lore = new LinkedList<>();
         for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
             if (e.getKey() instanceof CustomEnch) {
                 lore.add(createLoreLine((CustomEnch) e.getKey(), e.getValue()));
@@ -153,7 +153,7 @@ public class EnchantmentUtils {
             if (power == -1) power = 1;
             for (CustomEnch ce : CustomEnch.values()) {
                 if (s.startsWith(ce.getLoreName())) {
-                    return new AbstractMap.SimpleEntry<Enchantment, Integer>(ce, power);
+                    return new AbstractMap.SimpleEntry<>(ce, power);
                 }
             }
         }
@@ -394,11 +394,9 @@ public class EnchantmentUtils {
         if (!(target.getItemMeta() instanceof Damageable)) return 0;
         if (targetType == itemType) {
             Damageable itemMeta = (Damageable) item.getItemMeta();
-            int repairAmount = (int) Math.floor(targetType.getMaxDurability() * 1.12) - itemMeta.getDamage(); // repairs by second item amount + 12% of max durability
-            return repairAmount;
+            return (int) Math.floor(targetType.getMaxDurability() * 1.12) - itemMeta.getDamage(); // repairs by second item amount + 12% of max durability
         } else if (MaterialType.fromMaterial(targetType).canRepairWith(itemType)) {
-            int repairAmount = (int) Math.floor(targetType.getMaxDurability() * 0.25 * item.getAmount()); // repairs by 25% per valid repair item
-            return repairAmount;
+            return (int) Math.floor(targetType.getMaxDurability() * 0.25 * item.getAmount()); // repairs by 25% per valid repair item
         }
         return 0;
     }
@@ -436,8 +434,7 @@ public class EnchantmentUtils {
             Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
             Object nbtTag = nmsItem.getClass().getMethod("getTag").invoke(nmsItem);
             if (nbtTag != null && (boolean) nbtTag.getClass().getMethod("hasKey", String.class).invoke(nbtTag, "AnvilUses")) {
-                int val = (int) nbtTag.getClass().getMethod("getInt", String.class).invoke(nbtTag, "AnvilUses");
-                return val;
+                return (int) nbtTag.getClass().getMethod("getInt", String.class).invoke(nbtTag, "AnvilUses");
             } else {
                 return 0;
             }

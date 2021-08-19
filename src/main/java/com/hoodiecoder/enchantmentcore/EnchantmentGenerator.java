@@ -29,7 +29,7 @@ import static com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType.*;
  */
 public class EnchantmentGenerator {
     private final int version;
-    private final Map<UUID, Integer> numberOfEnchants = new HashMap<UUID, Integer>();
+    private final Map<UUID, Integer> numberOfEnchants = new HashMap<>();
     private final int randomModifier;
     private final Random r = new Random();
 
@@ -41,7 +41,7 @@ public class EnchantmentGenerator {
      */
     public EnchantmentGenerator(int version) {
         this.version = version;
-        randomModifier = (int) (Math.random() * Math.random() * 1000);
+        randomModifier = r.nextInt(1000);
     }
 
     /**
@@ -58,14 +58,12 @@ public class EnchantmentGenerator {
     public List<EnchantmentInformation> getOffers(ItemStack item, Player enchanter, int bonus, double amountMultiplier, boolean allowMulti, boolean allowTreasure, boolean axesAsWeapons) {
         if (bonus > 15) bonus = 15;
         UUID enchantID = enchanter.getUniqueId();
-        if (!numberOfEnchants.containsKey(enchantID)) {
-            numberOfEnchants.put(enchantID, 0);
-        }
+        numberOfEnchants.putIfAbsent(enchantID, 0);
         int modifier = numberOfEnchants.get(enchantID) + randomModifier;
-        List<EnchantmentInformation> offers = new ArrayList<EnchantmentInformation>();
+        List<EnchantmentInformation> offers = new ArrayList<>();
         Material mat = item.getType();
         boolean allowMultiple = true;
-        int base = ((r.nextInt(8) + 1) + (int) Math.floor((double) bonus / 2.0) + (r.nextInt(bonus + 1)));
+        int base = ((r.nextInt(8) + 1) + (int) Math.floor(bonus / 2.0) + (r.nextInt(bonus + 1)));
         int[] levels = {Math.max(base / 3, 1), (base * 2) / 3 + 1, Math.max(base, bonus * 2)};
         if (!allowMulti && ENCHANTED_BOOK.contains(mat)) {
             allowMultiple = false;
@@ -141,7 +139,7 @@ public class EnchantmentGenerator {
         List<Enchantment> offer = new ArrayList<>();
         List<Integer> levels = new ArrayList<>();
         Material mat = item.getType();
-        r.setSeed(enchanter.getUniqueId().hashCode() + mat.toString().hashCode() + modifier);
+        r.setSeed(enchanter.getUniqueId().hashCode() + mat.toString().hashCode() + (long) modifier);
         int enchantability = generateEnchantability(mat);
         int modifiedLevel = baseLevel + r.nextInt(enchantability / 4 + 1) + r.nextInt(enchantability / 4 + 1) + 1;
         float bonus = 1 + (r.nextFloat() + r.nextFloat() - 1) * 0.15F;
@@ -163,7 +161,7 @@ public class EnchantmentGenerator {
                 if (randRange < 0) {
                     offer.add(e);
                     levels.add(lvl);
-                    Map<Enchantment, Integer> possibilitiesCopy = new HashMap<Enchantment, Integer>(possibilities);
+                    Map<Enchantment, Integer> possibilitiesCopy = new HashMap<>(possibilities);
                     for (Enchantment ench : possibilities.keySet()) {
                         if (ench.conflictsWith(e)) {
                             possibilitiesCopy.remove(ench);
@@ -174,15 +172,15 @@ public class EnchantmentGenerator {
                 }
             }
             if (enchAmount <= 0)
-                modifiedChance = (int) Math.floor(((double) modifiedChance) / 2.0);
+                modifiedChance = (int) Math.floor(modifiedChance / 2.0);
             else
                 modifiedChance--;
         } while (enchAmount <= 0 ? floatLessThan(r.nextFloat(), (modifiedChance + 1) / 50.0F) : modifiedChance >= 1);
-        if (offer == null || offer.isEmpty()) return new EnchantmentInformation(offer, levels, baseLevel);
+        if (offer.isEmpty()) return new EnchantmentInformation(offer, levels, baseLevel);
         if (enchAmount <= 0) {
             int randomChoice = r.nextInt(offer.size());
             if (ENCHANTED_BOOK.contains(mat) && !allowMultiple) {
-                List<Enchantment> offerCopy = new ArrayList<Enchantment>(offer);
+                List<Enchantment> offerCopy = new ArrayList<>(offer);
                 for (Enchantment ench : offer) {
                     if (offer.indexOf(ench) != randomChoice) {
                         offerCopy.remove(ench);

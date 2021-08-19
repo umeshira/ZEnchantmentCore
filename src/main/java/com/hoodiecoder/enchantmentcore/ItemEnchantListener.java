@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * Event listener responsible for applying the custom enchantment generator to enchantment tables and anvils.
@@ -68,26 +69,23 @@ public class ItemEnchantListener implements Listener {
         ItemMeta meta = event.getItem().getItemMeta();
         List<String> lore = meta.getLore();
         if (lore == null) {
-            lore = new LinkedList<String>();
+            meta.setLore(new LinkedList<>());
         }
         event.getItem().setItemMeta(meta);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(core, new Runnable() {
-            @Override
-            public void run() {
-                ItemStack item = event.getInventory().getItem(0);
-                ItemMeta iMeta = item.getItemMeta();
-                if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
-                    EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta) iMeta;
-                    event.getEnchantsToAdd().forEach((ench, lvl) -> {
-                        if (ench instanceof CustomEnch) {
-                            eMeta.addStoredEnchant(ench, lvl, true);
-                        }
-                    });
-                }
-                List<String> createdLore = EnchantmentUtils.createLore(map, item.getItemMeta().getLore());
-                iMeta.setLore(createdLore);
-                item.setItemMeta(iMeta);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(core, () -> {
+            ItemStack item = event.getInventory().getItem(0);
+            ItemMeta iMeta = item.getItemMeta();
+            if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
+                EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta) iMeta;
+                event.getEnchantsToAdd().forEach((ench, lvl) -> {
+                    if (ench instanceof CustomEnch) {
+                        eMeta.addStoredEnchant(ench, lvl, true);
+                    }
+                });
             }
+            List<String> createdLore = EnchantmentUtils.createLore(map, item.getItemMeta().getLore());
+            iMeta.setLore(createdLore);
+            item.setItemMeta(iMeta);
         }); // schedule needed since Minecraft will not apply custom enchantments to books (for some reason)
     }
 
@@ -148,7 +146,7 @@ public class ItemEnchantListener implements Listener {
                     EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, false);
                     List<String> lore = firstMeta.getLore();
                     if (lore == null) {
-                        lore = new LinkedList<String>();
+                        lore = new LinkedList<>();
                     }
                     List<String> createdLore = EnchantmentUtils.createLore(combinedEnchs, lore);
                     firstMeta.setLore(createdLore);
@@ -156,7 +154,7 @@ public class ItemEnchantListener implements Listener {
                 }
             }
         }
-        if (!inv.getRenameText().equals(firstMeta.getDisplayName())) {
+        if (!Objects.equals(inv.getRenameText(), firstMeta.getDisplayName())) {
             firstMeta.setDisplayName(inv.getRenameText());
             repair += 1;
             canApply = true;

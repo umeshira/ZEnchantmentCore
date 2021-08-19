@@ -26,13 +26,9 @@ public class EnchantmentInformation {
      */
     public EnchantmentInformation(List<Enchantment> enchs, List<Integer> levels, int cost) {
         if (enchs.size() > levels.size()) {
-            for (int i = enchs.size() - 1; i >= levels.size(); i--) {
-                enchs.remove(i);
-            }
+            enchs.subList(levels.size(), enchs.size()).clear();
         } else if (enchs.size() < levels.size()) {
-            for (int i = levels.size() - 1; i >= enchs.size(); i--) {
-                levels.remove(i);
-            }
+            levels.subList(enchs.size(), levels.size()).clear();
         }
         this.enchs = enchs;
         this.levels = levels;
