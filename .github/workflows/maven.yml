@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: Java CI with Maven
+name: Build & Deploy
 
 on:
   push:
@@ -28,7 +25,7 @@ jobs:
       with:
         name: "ZEnchantmentCore"
         path: "./target/ZEnchantmentCore.jar"
-    - name: Deploy
+    - name: Deploy Javadocs
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
