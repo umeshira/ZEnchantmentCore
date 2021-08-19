@@ -220,15 +220,6 @@ public abstract class CustomEnch extends Enchantment {
     public abstract Rarity getRarity();
 
     /**
-     * <p>Gets the applicable target for this enchantment.</p>
-     * <p>The enchantment target determines what type of items the enchantment can be applied to.</p>
-     *
-     * @return The enchantment's applicable target
-     */
-    @Override
-    public abstract EnchantmentTarget getItemTarget();
-
-    /**
      * <p>Gets the list of applicable equipment slots for this enchantment.</p>
      * <p>The equipment slot is dependent on the <code>EnchantmentTarget</code> of the enchantment.</p>
      *
@@ -236,11 +227,10 @@ public abstract class CustomEnch extends Enchantment {
      * @see #getItemTarget()
      */
     public final EquipmentSlot[] getEquipmentSlot() {
-        EquipmentSlot[] armorSlot = new EquipmentSlot[]{EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.HEAD};
         switch (getItemTarget()) {
             case ARMOR:
             case WEARABLE:
-                return armorSlot;
+                return new EquipmentSlot[]{EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.HEAD};
             case ARMOR_TORSO:
                 return new EquipmentSlot[]{EquipmentSlot.CHEST};
             case ARMOR_FEET:
@@ -283,18 +273,6 @@ public abstract class CustomEnch extends Enchantment {
     }
 
     /**
-     * <p>Gets the namespaced identifier for this enchantment.</p>
-     * <p>The key of the enchantment is equal to <code>NamespacedKey.minecraft({@link #getName()})</code>.</p>
-     *
-     * @return The namespaced identifier of the enchantment
-     * @see #getName()
-     */
-    @Override
-    public NamespacedKey getKey() {
-        return super.getKey();
-    }
-
-    /**
      * <p>Gets the internal name of this enchantment in upper case.</p>
      * <p>The name of the enchantment in normal case is equal to <code>{@link #getKey()}.getKey()</code>.</p>
      *
@@ -312,18 +290,9 @@ public abstract class CustomEnch extends Enchantment {
      * @return The starting level of the enchantment
      */
     @Override
-    public final int getStartLevel() {
+    public int getStartLevel() {
         return 0;
-
     }
-
-    /**
-     * <p>Gets the maximum level of this enchantment.</p>
-     *
-     * @return The maximum level of the enchantment
-     */
-    @Override
-    public abstract int getMaxLevel();
 
     /**
      * <p>Determines whether or not the enchantment is lenient in its enchanting capability.</p>
@@ -378,28 +347,6 @@ public abstract class CustomEnch extends Enchantment {
      */
     public boolean isCompatibleWith(Enchantment other) {
         return true;
-    }
-
-    /**
-     * <p>Checks if this enchantment is a cursed enchantment.</p>
-     * <p>A cursed enchantment will show up as red in the enchantment list rather than gray.</p>
-     *
-     * @return <code>true</code> if the enchantment is cursed; <code>false</code> otherwise.
-     */
-    @Override
-    public boolean isCursed() {
-        return false;
-    }
-
-    /**
-     * <p>Checks if this enchantment is a treasure enchantment.</p>
-     * <p>A treasure enchantment will only generate in loot tables and won't appear in enchantment tables by default.</p>
-     *
-     * @return <code>true</code> if the enchantment is a treasure enchantment; <code>false</code> otherwise.
-     */
-    @Override
-    public boolean isTreasure() {
-        return false;
     }
 
     /**
