@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  * Main plugin class for ZEnchantmentCore.
  */
 public class EnchantmentCore extends JavaPlugin {
-    private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment � " + ChatColor.GRAY;
+    private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
     private static EnchantmentCore instance;
     private FileConfiguration config;
     private CustomEnchListener customListener;
