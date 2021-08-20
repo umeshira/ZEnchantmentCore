@@ -290,7 +290,7 @@ public abstract class CustomEnch extends Enchantment {
      * @return The starting level of the enchantment
      */
     @Override
-    public int getStartLevel() {
+    public final int getStartLevel() {
         return 0;
     }
 
