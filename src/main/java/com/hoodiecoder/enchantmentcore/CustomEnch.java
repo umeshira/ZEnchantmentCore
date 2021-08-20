@@ -350,6 +350,28 @@ public abstract class CustomEnch extends Enchantment {
     }
 
     /**
+     * <p>Checks if this enchantment is a cursed enchantment.</p>
+     * <p>A cursed enchantment will show up as red in the enchantment list rather than gray.</p>
+     *
+     * @return <code>true</code> if the enchantment is cursed; <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isCursed() {
+        return false;
+    }
+
+    /**
+     * <p>Checks if this enchantment is a treasure enchantment.</p>
+     * <p>A treasure enchantment will only generate in loot tables and won't appear in enchantment tables by default.</p>
+     *
+     * @return <code>true</code> if the enchantment is a treasure enchantment; <code>false</code> otherwise.
+     */
+    @Override
+    public boolean isTreasure() {
+        return false;
+    }
+
+    /**
      * <p>Gets the display name of this enchantment that appears in item lore. This includes the color prefix for the enchantment.</p>
      *
      * @return The lore display name of the enchantment
