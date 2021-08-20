@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.hoodiecoder.enchantmentcore"},{"l":"com.hoodiecoder.enchantmentcore.utils"}];updateSearchResults();
