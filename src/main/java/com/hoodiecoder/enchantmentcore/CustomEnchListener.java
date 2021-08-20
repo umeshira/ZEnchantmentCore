@@ -166,15 +166,14 @@ public class CustomEnchListener implements Listener {
     }
 
     private void runEnchEvent(Event event, ListenerType lt) {
-        ListenerType ltype = lt;
-        if (ltype == null) return;
-        Entity entityPlayer = getEntityFromType(ltype, event);
+        if (lt == null) return;
+        Entity entityPlayer = getEntityFromType(lt, event);
         if (!(entityPlayer instanceof Player)) {
             return;
         }
         Player player = (Player) entityPlayer;
         PlayerInventory playerInv = player.getInventory();
-        callEvents(Arrays.asList(CustomEnch.values()), playerInv, event, ltype);
+        callEvents(Arrays.asList(CustomEnch.values()), playerInv, event, lt);
     }
 
     private ItemStack[] getApplicableItems(CustomEnch ench, PlayerInventory playerInv) {

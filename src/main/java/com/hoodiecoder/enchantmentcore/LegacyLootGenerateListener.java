@@ -48,7 +48,4 @@ public class LegacyLootGenerateListener implements Listener {
             }
         }
     }
-	/*@EventHandler
-	public void onOpenInventory(InventoryOpenEvent event) {
-	}*/
 }

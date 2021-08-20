@@ -36,7 +36,6 @@ public class EnchantmentCore extends JavaPlugin {
     private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
     private static EnchantmentCore instance;
     private FileConfiguration config;
-    private CustomEnchListener customListener;
     private EnchantmentGenerator coreGenerator;
     private int version, enchLimit;
 
@@ -78,7 +77,7 @@ public class EnchantmentCore extends JavaPlugin {
         reloadableEnable(false);
         ItemEnchantListener iel = new ItemEnchantListener(this, coreGenerator);
         AutoEnchListener ael = new AutoEnchListener(this);
-        customListener = new CustomEnchListener(this);
+        CustomEnchListener customListener = new CustomEnchListener(this);
         m.registerEvents(iel, this);
         m.registerEvents(ael, this);
         m.registerEvents(customListener, this);
@@ -134,7 +133,6 @@ public class EnchantmentCore extends JavaPlugin {
                     } else {
                         sender.sendMessage(messagePrefix + "Invalid permission.");
                     }
-                    return true;
                 } else {
                     switch (args[0].toLowerCase()) {
                         case "list":
@@ -163,12 +161,10 @@ public class EnchantmentCore extends JavaPlugin {
                         case "check":
                             if (!(sender instanceof Player)) {
                                 sender.sendMessage(messagePrefix + "Cannot be run from console.");
-                                break;
                             } else {
                                 if (sender.hasPermission("zenchantmentcore.util")) {
                                     if (player.getInventory().getItemInMainHand().getType() == org.bukkit.Material.AIR) {
                                         sender.sendMessage(messagePrefix + "Cannot check for empty hand.");
-                                        break;
                                     } else {
                                         org.bukkit.inventory.ItemStack main = player.getInventory().getItemInMainHand();
                                         List<String> messages = new LinkedList<>();
@@ -191,24 +187,22 @@ public class EnchantmentCore extends JavaPlugin {
                                                 sender.sendMessage(msg);
                                             }
                                         }
-                                        break;
                                     }
                                 } else {
                                     sender.sendMessage(messagePrefix + "Invalid permission.");
-                                    break;
                                 }
                             }
+                            break;
                         case "reload":
                             if (!(sender instanceof Player) || sender.hasPermission("zenchantmentcore.reload")) {
                                 sender.sendMessage(messagePrefix + "Reloading...");
                                 reloadableDisable(true);
                                 reloadableEnable(true);
                                 sender.sendMessage(messagePrefix + "Reloaded!");
-                                break;
                             } else {
                                 sender.sendMessage(messagePrefix + "Invalid permission.");
-                                break;
                             }
+                            break;
                         case "enchant":
                             return enchantCommand(sender, Arrays.copyOfRange(args, 1, args.length), false);
                         case "info":
@@ -240,8 +234,8 @@ public class EnchantmentCore extends JavaPlugin {
                             sender.sendMessage(messagePrefix + "Argument not recognized.");
                             break;
                     }
-                    return true;
                 }
+                return true;
             case "enchant":
                 return enchantCommand(sender, args, true);
             default:
@@ -309,7 +303,7 @@ public class EnchantmentCore extends JavaPlugin {
             }
             List<String> lore = meta.getLore();
             if (lore == null) {
-                lore = new LinkedList<String>();
+                lore = new LinkedList<>();
             }
             Map<Enchantment, Integer> enchMap = new HashMap<>();
             enchMap.put(ench, lvl);

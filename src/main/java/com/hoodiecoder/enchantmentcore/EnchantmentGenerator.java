@@ -53,6 +53,7 @@ public class EnchantmentGenerator {
      * @param amountMultiplier The multiplier affecting probability of gaining multiple enchantments
      * @param allowMulti       Indicates multiple enchantments are allowed in offer
      * @param allowTreasure    Indicates treasure enchantments are allowed in offer
+     * @param axesAsWeapons    Indicates axes can be treated as weapons
      * @return List of enchantment offers for given parameters
      */
     public List<EnchantmentInformation> getOffers(ItemStack item, Player enchanter, int bonus, double amountMultiplier, boolean allowMulti, boolean allowTreasure, boolean axesAsWeapons) {
@@ -103,7 +104,7 @@ public class EnchantmentGenerator {
                     if (randRange < 0) {
                         offer.add(e);
                         levels.add(lvl);
-                        Map<Enchantment, Integer> possibilitiesCopy = new HashMap<Enchantment, Integer>(possibilities);
+                        Map<Enchantment, Integer> possibilitiesCopy = new HashMap<>(possibilities);
                         for (Enchantment ench : possibilities.keySet()) {
                             if (ench.conflictsWith(e)) {
                                 possibilitiesCopy.remove(ench);
@@ -234,7 +235,7 @@ public class EnchantmentGenerator {
         Material mat = item.getType();
         for (Enchantment e : Enchantment.values()) {
             if (!(e instanceof CustomEnch) && (ENCHANTED_BOOK.contains(mat) || e.canEnchantItem(item)) && (allowTreasure || !e.isTreasure())) {
-                if (item.getType().toString().endsWith("_AXE") && e.getItemTarget() == EnchantmentTarget.WEAPON && !EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons"))
+                if (item.getType().toString().endsWith("_AXE") && e.getItemTarget() == EnchantmentTarget.WEAPON && !axesAsWeapons)
                     continue;
                 for (int i = e.getMaxLevel(); i >= 1; i--) {
                     if (EnchantmentUtils.getMinModifiedLevel(e, i) <= level && EnchantmentUtils.getMaxModifiedLevel(e, i) >= level) {
@@ -247,7 +248,7 @@ public class EnchantmentGenerator {
         for (CustomEnch e : CustomEnch.values()) {
             if (e.isDisabled()) continue;
             if ((ENCHANTED_BOOK.contains(mat) || e.canEnchantItem(item)) && (allowTreasure || !e.isTreasure())) {
-                if (item.getType().toString().endsWith("_AXE") && e.getItemTarget() == EnchantmentTarget.WEAPON && !EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons"))
+                if (item.getType().toString().endsWith("_AXE") && e.getItemTarget() == EnchantmentTarget.WEAPON && !axesAsWeapons)
                     continue;
                 for (int i = e.getMaxLevel(); i >= 1; i--) {
                     if (e.getModifiedMin(i) <= level && e.getModifiedMax(i) >= level) {

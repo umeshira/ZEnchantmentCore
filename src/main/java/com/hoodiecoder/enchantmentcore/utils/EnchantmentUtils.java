@@ -205,11 +205,19 @@ public class EnchantmentUtils {
     }
 
     public static int getAnvilItemMultiplier(Enchantment ench) {
-        return (int) Math.pow(2, getRarity(ench).ordinal());
+        try {
+            return (int) Math.pow(2, getRarity(ench).ordinal());
+        } catch (NullPointerException e) {
+            return 1;
+        }
     }
 
     public static int getAnvilBookMultiplier(Enchantment ench) {
-        return (int) Math.ceil(Math.pow(2, getRarity(ench).ordinal() - 1));
+        try {
+            return (int) Math.ceil(Math.pow(2, getRarity(ench).ordinal() - 1));
+        } catch (NullPointerException e) {
+            return 1;
+        }
     }
 
     /**
