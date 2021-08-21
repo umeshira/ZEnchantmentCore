@@ -438,18 +438,7 @@ public class EnchantmentUtils {
      * @return The anvil use number of the item
      */
     public static int getAnvilUses(ItemStack item) {
-        try {
-            Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            Object nbtTag = nmsItem.getClass().getMethod("getTag").invoke(nmsItem);
-            if (nbtTag != null && (boolean) nbtTag.getClass().getMethod("hasKey", String.class).invoke(nbtTag, "AnvilUses")) {
-                return (int) nbtTag.getClass().getMethod("getInt", String.class).invoke(nbtTag, "AnvilUses");
-            } else {
-                return 0;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
+        return (int) (Math.log(getAnvilCost(item)+1)/Math.log(2));
     }
 
     /**
@@ -459,7 +448,13 @@ public class EnchantmentUtils {
      * @return The anvil cost of the item
      */
     public static int getAnvilCost(ItemStack item) {
-        return (int) Math.pow(2, getAnvilUses(item)) - 1;
+        try {
+            Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+            return (int) nmsItem.getClass().getMethod("getRepairCost").invoke(nmsItem);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**
@@ -470,14 +465,21 @@ public class EnchantmentUtils {
      * @return A copy of the item with the modified data.
      */
     public static ItemStack setAnvilUses(ItemStack item, int num) {
+        return setAnvilCost(item, (int)Math.pow(2, num) - 1);
+    }
+
+    /**
+     * Sets the anvil cost to the specified number on a copy of the given item.
+     *
+     * @param item The item to test
+     * @param num  Cost to set to
+     * @return A copy of the item with the modified data.
+     */
+    public static ItemStack setAnvilCost(ItemStack item, int num) {
         try {
             Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            Object nbtTag = nmsItem.getClass().getMethod("getTag").invoke(nmsItem);
-            if (nbtTag != null) {
-                nbtTag.getClass().getMethod("setInt", String.class, int.class).invoke(nbtTag, "AnvilUses", num);
-                nmsItem.getClass().getMethod("setTag", nbtTag.getClass()).invoke(nmsItem, nbtTag);
-                return (ItemStack) getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
-            }
+            nmsItem.getClass().getMethod("setRepairCost", int.class).invoke(nmsItem, num);
+            return (ItemStack) getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
         } catch (Exception e) {
             e.printStackTrace();
         }

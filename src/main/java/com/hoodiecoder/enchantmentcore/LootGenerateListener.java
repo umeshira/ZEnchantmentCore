@@ -25,14 +25,14 @@ public class LootGenerateListener implements Listener {
         this.generator = generator;
     }
 
-    static void addEnchantToItem(EnchantmentGenerator generator, Entity looter, LootTable table, ItemStack i) {
+    static void addEnchantToItem(EnchantmentGenerator generator, LootTable table, ItemStack i) {
         ItemMeta iMeta = i.getItemMeta();
         if (!(iMeta instanceof EnchantmentStorageMeta) && iMeta.hasEnchants()) {
             Map<Enchantment, Integer> enchMap = iMeta.getEnchants();
             for (Entry<Enchantment, Integer> entry : enchMap.entrySet()) {
                 iMeta.removeEnchant(entry.getKey());
             }
-            EnchantmentInformation enchInfo = generator.getLootOffer(i, looter, table, enchMap.size(), true);
+            EnchantmentInformation enchInfo = generator.getLootOffer(i, table, enchMap.size(), true);
             for (Entry<Enchantment, Integer> ench : enchInfo.toMap().entrySet()) {
                 iMeta.addEnchant(ench.getKey(), ench.getValue(), false);
             }
@@ -44,7 +44,7 @@ public class LootGenerateListener implements Listener {
             for (Entry<Enchantment, Integer> entry : enchMap.entrySet()) {
                 storageMeta.removeStoredEnchant(entry.getKey());
             }
-            EnchantmentInformation enchInfo = generator.getLootOffer(i, looter, table, enchMap.size(), true);
+            EnchantmentInformation enchInfo = generator.getLootOffer(i, table, enchMap.size(), true);
             for (Entry<Enchantment, Integer> ench : enchInfo.toMap().entrySet()) {
                 storageMeta.addStoredEnchant(ench.getKey(), ench.getValue(), false);
             }
@@ -56,7 +56,7 @@ public class LootGenerateListener implements Listener {
     public void onGenerate(LootGenerateEvent e) {
         List<ItemStack> loot = e.getLoot();
         for (ItemStack i : loot) {
-            addEnchantToItem(generator, e.getEntity(), e.getLootTable(), i);
+            addEnchantToItem(generator, e.getLootTable(), i);
         }
     }
 }

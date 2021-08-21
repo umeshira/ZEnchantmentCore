@@ -90,7 +90,7 @@ public class EnchantmentCore extends JavaPlugin {
         }
         new UpdateChecker(this, 88310).getVersion(version -> {
             if (!this.getDescription().getVersion().equalsIgnoreCase(version.substring(1))) {
-                String str = ChatColor.DARK_AQUA + "ZEnchantmentCore � " + ChatColor.GRAY + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";
+                String str = messagePrefix + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";
                 Bukkit.getConsoleSender().sendMessage(str);
                 Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "You can download it at " + ChatColor.DARK_AQUA + "https://www.spigotmc.org/resources/zenchantmentcore.88310/");
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -127,7 +127,7 @@ public class EnchantmentCore extends JavaPlugin {
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " list" + ChatColor.GRAY + " - lists all enchantments");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " help" + ChatColor.GRAY + " - displays this page");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " check" + ChatColor.GRAY + " - checks enchantments on main hand");
-                        sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " enchant <enchantment> [level]" + ChatColor.GRAY + " - adds enchantment to main hand");
+                        sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " enchant <player> <enchantment> [level]" + ChatColor.GRAY + " - adds enchantment to main hand");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " reload" + ChatColor.GRAY + " - reloads config and enchantments");
                         sender.sendMessage(ChatColor.GRAY + "More commands will be added soon\u2122!");
                     } else {

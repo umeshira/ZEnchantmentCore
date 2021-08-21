@@ -331,7 +331,7 @@ public abstract class CustomEnch extends Enchantment {
      */
     @Override
     public boolean canEnchantItem(ItemStack stack) {
-        if (getItemTarget() == EnchantmentTarget.WEAPON && isLenient() || EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons")) {
+        if (getItemTarget() == EnchantmentTarget.WEAPON && (isLenient() || EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons"))) {
             return getItemTarget().includes(stack) || stack.getType().toString().endsWith("_AXE");
         }
         return getItemTarget().includes(stack);

@@ -8,6 +8,7 @@ import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
 import org.bukkit.loot.LootTables;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -29,9 +32,8 @@ import static com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType.*;
  */
 public class EnchantmentGenerator {
     private final int version;
-    private final Map<UUID, Integer> numberOfEnchants = new HashMap<>();
-    private final int randomModifier;
     private final Random r = new Random();
+    private final int randomModifier;
 
     /**
      * Creates a new <code>EnchantmentGenerator</code> with a given Minecraft version.
@@ -41,7 +43,10 @@ public class EnchantmentGenerator {
      */
     public EnchantmentGenerator(int version) {
         this.version = version;
-        randomModifier = r.nextInt(1000);
+        if (version >= 14)
+            randomModifier = 0;
+        else
+            randomModifier = r.nextInt();
     }
 
     /**
@@ -58,9 +63,7 @@ public class EnchantmentGenerator {
      */
     public List<EnchantmentInformation> getOffers(ItemStack item, Player enchanter, int bonus, double amountMultiplier, boolean allowMulti, boolean allowTreasure, boolean axesAsWeapons) {
         if (bonus > 15) bonus = 15;
-        UUID enchantID = enchanter.getUniqueId();
-        numberOfEnchants.putIfAbsent(enchantID, 0);
-        int modifier = numberOfEnchants.get(enchantID) + randomModifier;
+        int xpSeed = getXpSeed(enchanter);
         List<EnchantmentInformation> offers = new ArrayList<>();
         Material mat = item.getType();
         boolean allowMultiple = true;
@@ -70,7 +73,7 @@ public class EnchantmentGenerator {
             allowMultiple = false;
         }
         for (int i : levels) {
-            offers.add(generateOffer(item, enchanter, i, modifier, 0, amountMultiplier, allowMultiple, allowTreasure, axesAsWeapons));
+            offers.add(generateOffer(item, i, xpSeed, 0, amountMultiplier, allowMultiple, allowTreasure, axesAsWeapons));
         }
         return offers;
     }
@@ -79,17 +82,17 @@ public class EnchantmentGenerator {
      * Gets enchantment information for a given item in a loot table, given different generator parameters and settings.
      *
      * @param item       The item to get the offers for
-     * @param enchanter  The player opening the loot
      * @param table      The loot table to generate for
      * @param enchAmount Amount of enchantments to get
      * @param uniform    Whether the offers are uniformly generated
      * @return Loot offer for the given parameters
      */
-    public EnchantmentInformation getLootOffer(ItemStack item, Entity enchanter, LootTable table, int enchAmount, boolean uniform) {
-        int modifier = r.nextInt();
+    public EnchantmentInformation getLootOffer(ItemStack item, LootTable table, int enchAmount, boolean uniform) {
+        int seed = item.getItemMeta().toString().hashCode();
         if (!uniform) {
-            return generateOffer(item, enchanter, 30, modifier, enchAmount, 1.0, true, true, true);
+            return generateOffer(item,30, seed, enchAmount, 1.0, true, true, true);
         } else {
+            r.setSeed(item.getType().toString().hashCode() + seed);
             List<Enchantment> offer = new ArrayList<>();
             List<Integer> levels = new ArrayList<>();
             Map<Enchantment, Integer> possibilities = generateUniformPossibilities(item, true);
@@ -126,9 +129,8 @@ public class EnchantmentGenerator {
      * only has an effect when <code>enchAmount &lt;= 0</code>.</p>
      *
      * @param item             The item to get the offer for
-     * @param enchanter        The player opening the loot
      * @param baseLevel        The base enchantment level for the offer
-     * @param modifier         Arbitrary number that modifies the random seed
+     * @param xpSeed           Number that defines the seed of the enchantment
      * @param enchAmount       The number of enchantments to generate
      * @param amountMultiplier Multiplier that changes the random chance of generating more enchantments
      * @param allowMultiple    Indicates multiple enchantments are allowed in offer
@@ -136,11 +138,11 @@ public class EnchantmentGenerator {
      * @param axesAsWeapons    Indicates axes can be treated as weapons
      * @return A single enchantment offer for the given parameters
      */
-    public EnchantmentInformation generateOffer(ItemStack item, Entity enchanter, int baseLevel, int modifier, int enchAmount, double amountMultiplier, boolean allowMultiple, boolean allowTreasure, boolean axesAsWeapons) {
+    public EnchantmentInformation generateOffer(ItemStack item, int baseLevel, int xpSeed, int enchAmount, double amountMultiplier, boolean allowMultiple, boolean allowTreasure, boolean axesAsWeapons) {
         List<Enchantment> offer = new ArrayList<>();
         List<Integer> levels = new ArrayList<>();
         Material mat = item.getType();
-        r.setSeed(enchanter.getUniqueId().hashCode() + mat.toString().hashCode() + (long) modifier);
+        r.setSeed(mat.toString().hashCode() + (long) xpSeed);
         int enchantability = generateEnchantability(mat);
         int modifiedLevel = baseLevel + r.nextInt(enchantability / 4 + 1) + r.nextInt(enchantability / 4 + 1) + 1;
         float bonus = 1 + (r.nextFloat() + r.nextFloat() - 1) * 0.15F;
@@ -333,13 +335,25 @@ public class EnchantmentGenerator {
         return bonus;
     }
 
-    void updatePlayer(Player pl) {
-        UUID enchantID = pl.getUniqueId();
-        if (!numberOfEnchants.containsKey(enchantID)) {
-            numberOfEnchants.put(enchantID, 0);
+    public int getXpSeed(Player enchanter) {
+        PersistentDataContainer container = enchanter.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(EnchantmentCore.getInstance(), "xp_seed");
+        if (container.has(key, PersistentDataType.INTEGER)) {
+            return container.get(key, PersistentDataType.INTEGER);
         } else {
-            numberOfEnchants.put(enchantID, numberOfEnchants.get(enchantID) + 1);
+            return updateXpSeed(enchanter);
         }
+    }
+
+    public int updateXpSeed(Player enchanter) {
+        int random = r.nextInt();
+        setXpSeed(enchanter, random);
+        return random;
+    }
+
+    public void setXpSeed(Player enchanter, int seed) {
+        NamespacedKey key = new NamespacedKey(EnchantmentCore.getInstance(), "xp_seed");
+        enchanter.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, seed);
     }
 
     /**

@@ -28,7 +28,7 @@ public class LegacyLootGenerateListener implements Listener {
                 LootTable table = chest.getLootTable();
                 chest.getInventory().forEach(item -> {
                     if (item != null)
-                        LootGenerateListener.addEnchantToItem(generator, looter, table, item);
+                        LootGenerateListener.addEnchantToItem(generator, table, item);
                 });
             }
         }
@@ -43,7 +43,7 @@ public class LegacyLootGenerateListener implements Listener {
                 LootTable table = minecart.getLootTable();
                 minecart.getInventory().forEach(item -> {
                     if (item != null)
-                        LootGenerateListener.addEnchantToItem(generator, looter, table, item);
+                        LootGenerateListener.addEnchantToItem(generator, table, item);
                 });
             }
         }

@@ -58,7 +58,7 @@ public class ItemEnchantListener implements Listener {
     public void onEnchant(EnchantItemEvent event) {
         if (core.getConfig().getBoolean("enable-custom-generator")) {
             EnchantmentInformation enchants = generator.getOffers(event.getItem(), event.getEnchanter(), generator.getBonusNumber(event.getEnchantBlock()), EnchantmentUtils.generatorSettings().getDouble("enchantment-amount-multiplier"), EnchantmentUtils.generatorSettings().getBoolean("allow-stacked-books"), EnchantmentUtils.generatorSettings().getBoolean("allow-treasure-enchants"), EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons")).get(event.whichButton());
-            generator.updatePlayer(event.getEnchanter());
+            generator.updateXpSeed(event.getEnchanter());
             event.setExpLevelCost(enchants.getCost());
             event.getEnchantsToAdd().clear();
             for (Enchantment e : enchants.getEnchs()) {
