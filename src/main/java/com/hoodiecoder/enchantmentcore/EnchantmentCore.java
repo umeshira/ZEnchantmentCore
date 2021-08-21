@@ -224,7 +224,7 @@ public class EnchantmentCore extends JavaPlugin {
                             sender.sendMessage(ChatColor.DARK_AQUA + "Display name: " + ChatColor.AQUA + ench.getDisplayName());
                             sender.sendMessage(ChatColor.DARK_AQUA + "Owner plugin: " + ChatColor.AQUA + ench.getOwnerPlugin().getName());
                             sender.sendMessage(ChatColor.DARK_AQUA + "Maximum level: " + ChatColor.AQUA + ench.getMaxLevel());
-                            sender.sendMessage(ChatColor.DARK_AQUA + "Rarity: " + ChatColor.AQUA + ench.getRarity().displayName());
+                            sender.sendMessage(ChatColor.DARK_AQUA + "Rarity: " + ChatColor.AQUA + ench.getEnchantmentRarity().displayName());
                             String lowerTarget = ench.getItemTarget().toString().replace('_', ' ').toLowerCase();
                             sender.sendMessage(ChatColor.DARK_AQUA + "Enchantment target: " + ChatColor.AQUA + lowerTarget.substring(0, 1).toUpperCase() + lowerTarget.substring(1));
                             sender.sendMessage(ChatColor.DARK_AQUA + "Enchantment type: " + ChatColor.AQUA + (ench.isCursed() ? "Curse" : "Normal"));

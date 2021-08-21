@@ -2,6 +2,9 @@ package com.hoodiecoder.enchantmentcore;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -14,6 +17,7 @@ import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -211,13 +215,24 @@ public abstract class CustomEnch extends Enchantment {
         disabled = d;
     }
 
+    @Override
+    public final Component displayName(int i) {
+        return LegacyComponentSerializer.legacySection().deserialize(EnchantmentUtils.createLoreLine(this, i));
+    }
+
+    @Override
+    public final EnchantmentRarity getRarity() {
+        Rarity rarity = getEnchantmentRarity();
+        return rarity == Rarity.UNFINDABLE ? EnchantmentRarity.VERY_RARE : EnchantmentRarity.valueOf(rarity.name());
+    }
+
     /**
      * <p>Gets the rarity of the enchantment for use in enchantment generation.</p>
      *
      * @return The rarity of the enchantment
      * @see Rarity
      */
-    public abstract Rarity getRarity();
+    public abstract Rarity getEnchantmentRarity();
 
     /**
      * <p>Gets the list of applicable equipment slots for this enchantment.</p>
