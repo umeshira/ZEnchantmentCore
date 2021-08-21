@@ -189,7 +189,7 @@ public class EnchantmentUtils {
             VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
         }
         if (ench instanceof CustomEnch) {
-            Rarity r = ((CustomEnch) ench).getRarity();
+            Rarity r = ((CustomEnch) ench).getEnchantmentRarity();
             return r == null ? Rarity.UNFINDABLE : r;
         } else if (COMMON.contains(ench)) {
             return Rarity.COMMON;

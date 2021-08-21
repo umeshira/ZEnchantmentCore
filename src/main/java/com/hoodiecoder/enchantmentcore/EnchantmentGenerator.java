@@ -278,7 +278,7 @@ public class EnchantmentGenerator {
         }
         for (CustomEnch e : CustomEnch.values()) {
             if (e.isDisabled()) continue;
-            if (e.getRarity() != Rarity.UNFINDABLE && (ENCHANTED_BOOK.contains(mat) || e.canEnchantItem(item)) && (allowTreasure || !e.isTreasure())) {
+            if (e.getEnchantmentRarity() != Rarity.UNFINDABLE && (ENCHANTED_BOOK.contains(mat) || e.canEnchantItem(item)) && (allowTreasure || !e.isTreasure())) {
                 int lvl = r.nextInt(e.getMaxLevel()) + 1;
                 possibilities.put(e, lvl);
             }
