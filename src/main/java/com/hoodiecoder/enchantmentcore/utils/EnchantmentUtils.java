@@ -49,15 +49,6 @@ public class EnchantmentUtils {
         }
     }
 
-    public static Class<?> getCraftBukkitClass(String cl) {
-        try {
-            return Class.forName("org.bukkit.craftbukkit." + VersionUtils.NMS_VERSION + "." + cl);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     /**
      * Returns the roman numeral for the specified integer.
      *
@@ -386,7 +377,7 @@ public class EnchantmentUtils {
      */
     public static int getAnvilCost(ItemStack item) {
         try {
-            Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+            Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
             return (int) nmsItem.getClass().getMethod("getRepairCost").invoke(nmsItem);
         } catch (Exception e) {
             e.printStackTrace();
@@ -414,9 +405,9 @@ public class EnchantmentUtils {
      */
     public static ItemStack setAnvilCost(ItemStack item, int num) {
         try {
-            Object nmsItem = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+            Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
             nmsItem.getClass().getMethod("setRepairCost", int.class).invoke(nmsItem, num);
-            return (ItemStack) getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
+            return (ItemStack) VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
         } catch (Exception e) {
             e.printStackTrace();
         }
