@@ -27,11 +27,35 @@ import java.util.*;
  * @see EnchantmentHolder
  */
 public abstract class CustomEnch extends Enchantment {
+    private static final Field byKeyField;
+    private static final Field byNameField;
+
     private static final List<NamespacedKey> reservedKeys = new ArrayList<>();
     private static final List<CustomEnch> pendingEnchants = new ArrayList<>();
     private static final Map<NamespacedKey, CustomEnch> byKey = new LinkedHashMap<>();
     private static final Map<String, CustomEnch> byName = new LinkedHashMap<>();
     private static int nextID = 0;
+
+    static {
+        Field acceptingNew;
+        Field keyField;
+        Field nameField;
+
+        try {
+            acceptingNew = Enchantment.class.getDeclaredField("acceptingNew");
+            acceptingNew.setAccessible(true);
+            acceptingNew.set(null, true);
+            keyField = Enchantment.class.getDeclaredField("byKey");
+            keyField.setAccessible(true);
+            nameField = Enchantment.class.getDeclaredField("byName");
+            nameField.setAccessible(true);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+
+        byKeyField = keyField;
+        byNameField = nameField;
+    }
 
     private final int coreID;
     private final String intName;
@@ -129,13 +153,6 @@ public abstract class CustomEnch extends Enchantment {
     void registerEnchantment() {
         setDisabled(!getDisabledEnchants().isEmpty() && getDisabledEnchants().contains(getName().toLowerCase()));
         if (!isDisabled() && !byKey.containsKey(super.getKey())) {
-            try {
-                Field f = Enchantment.class.getDeclaredField("acceptingNew");
-                f.setAccessible(true);
-                f.set(null, true);
-            } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
             byKey.put(super.getKey(), this);
             byName.put(getName(), this);
             try {
@@ -152,13 +169,9 @@ public abstract class CustomEnch extends Enchantment {
             byKey.remove(getKey());
             byName.remove(getName());
             try {
-                Field kf = Enchantment.class.getDeclaredField("byKey");
-                kf.setAccessible(true);
-                HashMap<NamespacedKey, Enchantment> byKey = (HashMap<NamespacedKey, Enchantment>) kf.get(null);
-                byKey.remove(super.getKey());
-                Field nf = Enchantment.class.getDeclaredField("byName");
-                nf.setAccessible(true);
-                HashMap<String, Enchantment> byName = (HashMap<String, Enchantment>) nf.get(null);
+                Map<NamespacedKey, Enchantment> byKey = (Map<NamespacedKey, Enchantment>) byKeyField.get(null);
+                Map<String, Enchantment> byName = (Map<String, Enchantment>) byNameField.get(null);
+                byKey.remove(getKey());
                 byName.remove(getName());
             } catch (Exception e) {
                 e.printStackTrace();
