@@ -2,7 +2,6 @@ package com.hoodiecoder.enchantmentcore;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.LootGenerateEvent;

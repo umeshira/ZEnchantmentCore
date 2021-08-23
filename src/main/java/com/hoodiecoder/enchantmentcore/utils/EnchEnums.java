@@ -275,20 +275,20 @@ public class EnchEnums {
         MaterialType(Material[] materials, Material... repairs) {
             this.materials = new ArrayList<>(Arrays.asList(materials));
             this.repairs = new ArrayList<>(Arrays.asList(repairs));
-            if (this.name().equals("WOOD") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16) {
+            if (this.name().equals("WOOD") && VersionUtils.SERVER_VERSION >= 16) {
                 this.repairs.add(WARPED_PLANKS);
                 this.repairs.add(CRIMSON_PLANKS);
-            } else if (this.toString().equals("STONE") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16)
+            } else if (this.toString().equals("STONE") && VersionUtils.SERVER_VERSION >= 16)
                 this.repairs.add(BLACKSTONE);
-            else if (this.toString().equals("STONE") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 17)
+            else if (this.toString().equals("STONE") && VersionUtils.SERVER_VERSION >= 17)
                 this.repairs.add(COBBLED_DEEPSLATE);
         }
 
         MaterialType() {
-            if (this.toString().equals("NETHERITE_ARMOR") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16) {
+            if (this.toString().equals("NETHERITE_ARMOR") && VersionUtils.SERVER_VERSION >= 16) {
                 this.materials = Arrays.asList(NETHERITE_HELMET, NETHERITE_CHESTPLATE, NETHERITE_LEGGINGS, NETHERITE_BOOTS);
                 this.repairs = Collections.singletonList(NETHERITE_INGOT);
-            } else if (this.toString().equals("NETHERITE") && EnchantmentUtils.getGenerator().getMinecraftVersion() >= 16) {
+            } else if (this.toString().equals("NETHERITE") && VersionUtils.SERVER_VERSION >= 16) {
                 this.materials = Arrays.asList(NETHERITE_SWORD, NETHERITE_PICKAXE, NETHERITE_AXE, NETHERITE_SHOVEL, NETHERITE_HOE);
                 this.repairs = Collections.singletonList(NETHERITE_INGOT);
             } else {

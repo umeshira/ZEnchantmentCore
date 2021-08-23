@@ -6,7 +6,6 @@ import com.hoodiecoder.enchantmentcore.EnchantmentGenerator;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.EnchConstants;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,17 +22,36 @@ import java.util.Map.Entry;
  * Utility class containing several useful methods for using the plugin, as well as manipulating and working with enchantments.
  */
 public class EnchantmentUtils {
+    private static final List<Enchantment> COMMON;
+    private static final List<Enchantment> UNCOMMON;
+    private static final List<Enchantment> RARE;
+    private static final List<Enchantment> VERY_RARE;
     private static final String[] numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
-    private static final String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
     private static final String enchCode = ChatColor.GRAY + "" + ChatColor.MAGIC + " ";
 
-    public static String getNMSVersion() {
-        return version;
+    static {
+        int mcVersion = VersionUtils.SERVER_VERSION;
+        if (mcVersion >= 16) {
+            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE, Enchantment.PIERCING);
+            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY, Enchantment.QUICK_CHARGE);
+            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MULTISHOT, Enchantment.MENDING);
+            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE, Enchantment.SOUL_SPEED);
+        } else if (mcVersion >= 14) {
+            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE, Enchantment.PIERCING);
+            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY, Enchantment.QUICK_CHARGE);
+            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MULTISHOT, Enchantment.MENDING);
+            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
+        } else {
+            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE);
+            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY);
+            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MENDING);
+            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
+        }
     }
 
     public static Class<?> getCraftBukkitClass(String cl) {
         try {
-            return Class.forName("org.bukkit.craftbukkit." + version + "." + cl);
+            return Class.forName("org.bukkit.craftbukkit." + VersionUtils.NMS_VERSION + "." + cl);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -52,48 +70,12 @@ public class EnchantmentUtils {
     }
 
     /**
-     * Returns the integer value of the specified roman numeral 1-10.
-     *
-     * @param num The roman numeral to convert
-     * @return Integer value of roman numeral for numbers 1-10. If <code>num</code>
-     * is instead a numeric String, it will return the integer value of that
-     * String; otherwise, it will return <code>-1</code>.
-     */
-    public static int parseRomanNumeral(String num) {
-        int index = Arrays.asList(numerals).indexOf(num);
-        if (index > -1) return index + 1;
-        try {
-            return Integer.parseInt(num);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    /**
      * Gets the enchantment code applied at the end of every enchantment lore line.
      *
      * @return Enchantment lore code
      */
     public static String getEnchCode() {
         return enchCode;
-    }
-
-    /**
-     * Parses a list containing item lore into its respective enchantments and levels.
-     *
-     * @param lore The lore to parse
-     * @return Map of enchantments and their levels based on the lore
-     */
-    public static Map<Enchantment, Integer> parseLore(List<String> lore) {
-        Map<Enchantment, Integer> enchMap = new HashMap<>();
-        if (lore == null || lore.isEmpty()) return null;
-        for (String s : lore) {
-            Entry<Enchantment, Integer> parsedLine = parseLoreLine(s);
-            if (parsedLine != null) {
-                enchMap.put(parsedLine.getKey(), parsedLine.getValue());
-            }
-        }
-        return enchMap;
     }
 
     /**
@@ -112,7 +94,7 @@ public class EnchantmentUtils {
         }
         if (currentLore != null) {
             for (String str : currentLore) {
-                if (!str.endsWith(enchCode) && parseLoreLine(str) == null) {
+                if (!str.endsWith(enchCode)) {
                     lore.add(str);
                 }
             }
@@ -137,57 +119,12 @@ public class EnchantmentUtils {
     }
 
     /**
-     * Parses a single line of lore into an enchantment and its level.
-     *
-     * @param s The string to parse
-     * @return Parsed enchantment and its level; <code>null</code> if no enchantment could be extracted.
-     */
-    public static Entry<Enchantment, Integer> parseLoreLine(String s) {
-        String endCode = enchCode;
-        int power;
-        String[] split = s.split(" ");
-        if (s.endsWith(endCode)) {
-            String lastWord = split[split.length - 1];
-            lastWord = lastWord.substring(0, lastWord.length() - endCode.length());
-            power = parseRomanNumeral(lastWord);
-            if (power == -1) power = 1;
-            for (CustomEnch ce : CustomEnch.values()) {
-                if (s.startsWith(ce.getLoreName())) {
-                    return new AbstractMap.SimpleEntry<>(ce, power);
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Gets the rarity of the specified enchantment.
      *
      * @param ench The enchantment to test
      * @return Rarity of the enchantment; <code>null</code> if the enchantment is unknown.
      */
     public static Rarity getRarity(Enchantment ench) {
-        int mcVersion = EnchantmentCore.getInstance().getGenerator().getMinecraftVersion();
-        final List<Enchantment> COMMON;
-        final List<Enchantment> UNCOMMON;
-        final List<Enchantment> RARE;
-        final List<Enchantment> VERY_RARE;
-        if (mcVersion >= 16) {
-            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE, Enchantment.PIERCING);
-            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY, Enchantment.QUICK_CHARGE);
-            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MULTISHOT, Enchantment.MENDING);
-            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE, Enchantment.SOUL_SPEED);
-        } else if (mcVersion >= 14) {
-            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE, Enchantment.PIERCING);
-            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY, Enchantment.QUICK_CHARGE);
-            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MULTISHOT, Enchantment.MENDING);
-            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
-        } else {
-            COMMON = Arrays.asList(Enchantment.PROTECTION_ENVIRONMENTAL, Enchantment.DAMAGE_ALL, Enchantment.DIG_SPEED, Enchantment.ARROW_DAMAGE);
-            UNCOMMON = Arrays.asList(Enchantment.PROTECTION_FIRE, Enchantment.PROTECTION_FALL, Enchantment.PROTECTION_PROJECTILE, Enchantment.DAMAGE_UNDEAD, Enchantment.DAMAGE_ARTHROPODS, Enchantment.KNOCKBACK, Enchantment.DURABILITY, Enchantment.LOYALTY);
-            RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MENDING);
-            VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
-        }
         if (ench instanceof CustomEnch) {
             Rarity r = ((CustomEnch) ench).getEnchantmentRarity();
             return r == null ? Rarity.UNFINDABLE : r;
@@ -438,7 +375,7 @@ public class EnchantmentUtils {
      * @return The anvil use number of the item
      */
     public static int getAnvilUses(ItemStack item) {
-        return (int) (Math.log(getAnvilCost(item)+1)/Math.log(2));
+        return (int) (Math.log(getAnvilCost(item) + 1) / Math.log(2));
     }
 
     /**
@@ -465,7 +402,7 @@ public class EnchantmentUtils {
      * @return A copy of the item with the modified data.
      */
     public static ItemStack setAnvilUses(ItemStack item, int num) {
-        return setAnvilCost(item, (int)Math.pow(2, num) - 1);
+        return setAnvilCost(item, (int) Math.pow(2, num) - 1);
     }
 
     /**

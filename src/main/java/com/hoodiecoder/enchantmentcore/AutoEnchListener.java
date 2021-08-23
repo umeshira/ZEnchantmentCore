@@ -1,6 +1,7 @@
 package com.hoodiecoder.enchantmentcore;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
+import com.hoodiecoder.enchantmentcore.utils.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class AutoEnchListener implements Listener {
 
     private void addAllLore(Inventory inv) {
         addLoreLoop(inv.getContents());
-        if (EnchantmentUtils.getGenerator().getMinecraftVersion() >= 14 && inv.getType() == InventoryType.GRINDSTONE) {
+        if (VersionUtils.SERVER_VERSION >= 14 && inv.getType() == InventoryType.GRINDSTONE) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(core, () -> {
                 GrindstoneInventory gInv = (GrindstoneInventory) inv;
                 ItemStack[] grindstoneItems = new ItemStack[]{gInv.getItem(2)};
