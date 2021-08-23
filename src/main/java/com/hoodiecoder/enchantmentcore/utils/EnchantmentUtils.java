@@ -6,17 +6,20 @@ import com.hoodiecoder.enchantmentcore.EnchantmentGenerator;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.EnchConstants;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
-import org.bukkit.ChatColor;
+import com.hoodiecoder.enchantmentcore.utils.lore.DefaultLoreHandler;
+import com.hoodiecoder.enchantmentcore.utils.lore.LoreHandler;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -27,8 +30,7 @@ public class EnchantmentUtils {
     private static final List<Enchantment> UNCOMMON;
     private static final List<Enchantment> RARE;
     private static final List<Enchantment> VERY_RARE;
-    private static final String[] numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
-    private static final String enchCode = ChatColor.GRAY + "" + ChatColor.MAGIC + " ";
+    private static LoreHandler loreHandler = new DefaultLoreHandler();
 
     static {
         int mcVersion = VersionUtils.SERVER_VERSION;
@@ -51,83 +53,32 @@ public class EnchantmentUtils {
     }
 
     /**
-     * Returns the roman numeral for the specified integer.
-     *
-     * @param num The number to convert
-     * @return Roman numeral for numbers 1-10; otherwise, it will return the integer as a String.
-     */
-    public static String getRomanNumeral(int num) {
-        if (num > numerals.length || num < 1) return Integer.toString(num);
-        return numerals[num - 1];
-    }
-
-    /**
-     * Gets the enchantment code applied at the end of every enchantment lore line.
-     *
-     * @return Enchantment lore code
-     */
-    public static String getEnchCode() {
-        return enchCode;
-    }
-
-    /**
      * Update the lore of the item meta
      *
      * @param meta the item meta
      */
     public static void updateItemLore(ItemMeta meta) {
-        if (meta == null) {
-            return;
-        }
-
-        // Load enchants
-        Map<Enchantment, Integer> enchs;
-        if (meta instanceof EnchantmentStorageMeta) {
-            enchs = ((EnchantmentStorageMeta) meta).getStoredEnchants();
-        } else {
-            enchs = meta.getEnchants();
-        }
-
-        // Create enchant lore
-        List<String> createdLore = new ArrayList<>();
-        if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) { // Only add lore if the item doesn't hide enchants
-            for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
-                if (e.getKey() instanceof CustomEnch) {
-                    createdLore.add(createLoreLine((CustomEnch) e.getKey(), e.getValue()));
-                }
-            }
-        }
-
-        // Add current lore
-        List<String> currentLore = meta.getLore();
-        if (currentLore != null) {
-            for (String str : currentLore) {
-                if (!str.endsWith(enchCode)) { // Should not contain enchant lore
-                    createdLore.add(str);
-                }
-            }
-        }
-
-        // Set lore to item meta
-        if (!createdLore.equals(currentLore)) {
-            meta.setLore(createdLore);
+        if (meta != null) {
+            loreHandler.updateItemLore(meta);
         }
     }
 
     /**
-     * Creates a single line of lore for a custom enchantment.
+     * Get the lore handler
      *
-     * @param ce  The custom enchantment
-     * @param lvl The level of the enchantment
-     * @return Lore line for the enchantment
+     * @return the lore handler
      */
-    public static String createLoreLine(CustomEnch ce, int lvl) {
-        String endCode = enchCode;
-        if (ce.getMaxLevel() > 1) {
-            return (ce.getLoreName() + " " + getRomanNumeral(lvl) + endCode);
-        } else {
-            return (ce.getLoreName() + endCode);
-        }
+    public static LoreHandler getLoreHandler() {
+        return loreHandler;
+    }
+
+    /**
+     * Set the lore handler
+     *
+     * @param loreHandler the lore handler
+     */
+    public static void setLoreHandler(LoreHandler loreHandler) {
+        EnchantmentUtils.loreHandler = loreHandler;
     }
 
     /**

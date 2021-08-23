@@ -3,6 +3,7 @@ package com.hoodiecoder.enchantmentcore;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
 import com.hoodiecoder.enchantmentcore.utils.UpdateChecker;
 import com.hoodiecoder.enchantmentcore.utils.VersionUtils;
+import com.hoodiecoder.enchantmentcore.utils.lore.DefaultLoreHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -146,7 +147,7 @@ public class EnchantmentCore extends JavaPlugin {
                                     if (ce.getMaxLevel() == 1) {
                                         levelRange = "";
                                     } else {
-                                        levelRange = EnchantmentUtils.getRomanNumeral(1) + "-" + EnchantmentUtils.getRomanNumeral(ce.getMaxLevel());
+                                        levelRange = 1 + "-" + DefaultLoreHandler.getRomanNumeral(ce.getMaxLevel());
                                     }
                                     sender.sendMessage(ChatColor.GRAY + " - " + chatColor + ce.getName().toLowerCase() + ", " + ce.getDisplayName() + " " + levelRange);
                                 }
