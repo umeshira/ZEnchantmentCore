@@ -258,17 +258,17 @@ public class EnchantmentUtils {
         if (meta instanceof EnchantmentStorageMeta) {
             EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta) meta;
             for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
-                if (!ignoreLevelRestriction && e.getValue() > e.getKey().getMaxLevel())
-                    eMeta.addStoredEnchant(e.getKey(), e.getKey().getMaxLevel(), false);
+                if (!ignoreLevelRestriction)
+                    eMeta.addStoredEnchant(e.getKey(), Math.min(e.getKey().getMaxLevel(), e.getValue()), false);
                 else
-                    eMeta.addStoredEnchant(e.getKey(), e.getValue(), ignoreLevelRestriction);
+                    eMeta.addStoredEnchant(e.getKey(), e.getValue(), true);
             }
         } else {
             for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
-                if (!ignoreLevelRestriction && e.getValue() > e.getKey().getMaxLevel())
-                    meta.addEnchant(e.getKey(), e.getKey().getMaxLevel(), false);
+                if (!ignoreLevelRestriction)
+                    meta.addEnchant(e.getKey(), Math.min(e.getKey().getMaxLevel(), e.getValue()), false);
                 else
-                    meta.addEnchant(e.getKey(), e.getValue(), ignoreLevelRestriction);
+                    meta.addEnchant(e.getKey(), e.getValue(), true);
             }
         }
     }
