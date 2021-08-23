@@ -2,6 +2,8 @@ package com.hoodiecoder.enchantmentcore;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
 import com.hoodiecoder.enchantmentcore.utils.UpdateChecker;
+import com.hoodiecoder.enchantmentcore.utils.VersionUtils;
+import com.hoodiecoder.enchantmentcore.utils.lore.DefaultLoreHandler;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -37,7 +39,7 @@ public class EnchantmentCore extends JavaPlugin {
     private static EnchantmentCore instance;
     private FileConfiguration config;
     private EnchantmentGenerator coreGenerator;
-    private int version, enchLimit;
+    private int enchLimit;
 
     /**
      * Gets the current instance of this plugin.
@@ -50,29 +52,25 @@ public class EnchantmentCore extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        String bukkitVers = Bukkit.getVersion();
         PluginManager m = getServer().getPluginManager();
-        if (bukkitVers.contains("1.17")) {
-            enchLimit = 37;
-            version = 17;
-        } else if (bukkitVers.contains("1.16")) {
-            enchLimit = 37;
-            version = 16;
-        } else if (bukkitVers.contains("1.15")) {
-            enchLimit = 36;
-            version = 15;
-        } else if (bukkitVers.contains("1.14")) {
-            enchLimit = 36;
-            version = 14;
-        } else if (bukkitVers.contains("1.13")) {
-            enchLimit = 33;
-            version = 13;
-        } else {
-            getLogger().log(Level.WARNING, "Version incompatible. Exiting plugin.");
-            m.disablePlugin(this);
-            return;
+        switch (VersionUtils.SERVER_VERSION) {
+            case 17:
+            case 16:
+                enchLimit = 37;
+                break;
+            case 15:
+            case 14:
+                enchLimit = 36;
+                break;
+            case 13:
+                enchLimit = 33;
+                break;
+            default:
+                getLogger().log(Level.WARNING, "Version incompatible. Exiting plugin.");
+                m.disablePlugin(this);
+                return;
         }
-        coreGenerator = new EnchantmentGenerator(version);
+        coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
         reloadableEnable(false);
         ItemEnchantListener iel = new ItemEnchantListener(this, coreGenerator);
@@ -81,7 +79,7 @@ public class EnchantmentCore extends JavaPlugin {
         m.registerEvents(iel, this);
         m.registerEvents(ael, this);
         m.registerEvents(customListener, this);
-        if (version >= 15) {
+        if (VersionUtils.SERVER_VERSION >= 15) {
             LootGenerateListener lgl = new LootGenerateListener(coreGenerator);
             m.registerEvents(lgl, this);
         } else {
@@ -149,7 +147,7 @@ public class EnchantmentCore extends JavaPlugin {
                                     if (ce.getMaxLevel() == 1) {
                                         levelRange = "";
                                     } else {
-                                        levelRange = EnchantmentUtils.getRomanNumeral(1) + "-" + EnchantmentUtils.getRomanNumeral(ce.getMaxLevel());
+                                        levelRange = DefaultLoreHandler.getRomanNumeral(1) + "-" + DefaultLoreHandler.getRomanNumeral(ce.getMaxLevel());
                                     }
                                     sender.sendMessage(ChatColor.GRAY + " - " + chatColor + ce.getName().toLowerCase() + ", " + ce.getDisplayName() + " " + levelRange);
                                 }
@@ -301,15 +299,7 @@ public class EnchantmentCore extends JavaPlugin {
                 }
                 return true;
             }
-            List<String> lore = meta.getLore();
-            if (lore == null) {
-                lore = new LinkedList<>();
-            }
-            Map<Enchantment, Integer> enchMap = new HashMap<>();
-            enchMap.put(ench, lvl);
-            List<String> createdLore = EnchantmentUtils.createLore(enchMap, lore);
-            lore.addAll(0, createdLore);
-            meta.setLore(lore);
+            EnchantmentUtils.updateItemLore(meta);
             item.setItemMeta(meta);
         }
         return true;

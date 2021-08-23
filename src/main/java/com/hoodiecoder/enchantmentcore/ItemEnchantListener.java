@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,17 +64,10 @@ public class ItemEnchantListener implements Listener {
                 event.getEnchantsToAdd().put(e, enchants.getLevels().get(enchants.getEnchs().indexOf(e)));
             }
         }
-        Map<Enchantment, Integer> map = event.getEnchantsToAdd();
-        ItemMeta meta = event.getItem().getItemMeta();
-        List<String> lore = meta.getLore();
-        if (lore == null) {
-            meta.setLore(new LinkedList<>());
-        }
-        event.getItem().setItemMeta(meta);
+        ItemStack item = event.getItem();
         Bukkit.getScheduler().scheduleSyncDelayedTask(core, () -> {
-            ItemStack item = event.getInventory().getItem(0);
             ItemMeta iMeta = item.getItemMeta();
-            if (item.getItemMeta() instanceof EnchantmentStorageMeta) {
+            if (iMeta instanceof EnchantmentStorageMeta) {
                 EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta) iMeta;
                 event.getEnchantsToAdd().forEach((ench, lvl) -> {
                     if (ench instanceof CustomEnch) {
@@ -83,8 +75,7 @@ public class ItemEnchantListener implements Listener {
                     }
                 });
             }
-            List<String> createdLore = EnchantmentUtils.createLore(map, item.getItemMeta().getLore());
-            iMeta.setLore(createdLore);
+            EnchantmentUtils.updateItemLore(iMeta);
             item.setItemMeta(iMeta);
         }); // schedule needed since Minecraft will not apply custom enchantments to books (for some reason)
     }
@@ -144,12 +135,7 @@ public class ItemEnchantListener implements Listener {
                 if (!combinedEnchs.equals(firstEnchantments) && validSacEnchants.size() != 0) {
                     EnchantmentUtils.removeAllEnchantments(firstMeta);
                     EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, false);
-                    List<String> lore = firstMeta.getLore();
-                    if (lore == null) {
-                        lore = new LinkedList<>();
-                    }
-                    List<String> createdLore = EnchantmentUtils.createLore(combinedEnchs, lore);
-                    firstMeta.setLore(createdLore);
+                    EnchantmentUtils.updateItemLore(firstMeta);
                     canApply = true;
                 }
             }

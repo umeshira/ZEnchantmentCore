@@ -7,13 +7,13 @@ package com.hoodiecoder.enchantmentcore;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentInformation;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
+import com.hoodiecoder.enchantmentcore.utils.VersionUtils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
@@ -31,19 +31,14 @@ import static com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType.*;
  * <p>Contains methods that generate enchantments, including all custom enchantments and more customizable features.</p>
  */
 public class EnchantmentGenerator {
-    private final int version;
     private final Random r = new Random();
     private final int randomModifier;
 
     /**
-     * Creates a new <code>EnchantmentGenerator</code> with a given Minecraft version.
-     *
-     * @param version Numeric Minecraft major version
-     * @see #getMinecraftVersion()
+     * Creates a new <code>EnchantmentGenerator</code>.
      */
-    public EnchantmentGenerator(int version) {
-        this.version = version;
-        if (version >= 14)
+    public EnchantmentGenerator() {
+        if (VersionUtils.SERVER_VERSION >= 14)
             randomModifier = 0;
         else
             randomModifier = r.nextInt();
@@ -90,7 +85,7 @@ public class EnchantmentGenerator {
     public EnchantmentInformation getLootOffer(ItemStack item, LootTable table, int enchAmount, boolean uniform) {
         int seed = item.getItemMeta().toString().hashCode();
         if (!uniform) {
-            return generateOffer(item,30, seed, enchAmount, 1.0, true, true, true);
+            return generateOffer(item, 30, seed, enchAmount, 1.0, true, true, true);
         } else {
             r.setSeed(item.getType().toString().hashCode() + seed);
             List<Enchantment> offer = new ArrayList<>();
@@ -101,7 +96,7 @@ public class EnchantmentGenerator {
                 for (Entry<Enchantment, Integer> entry : possibilities.entrySet()) {
                     Enchantment e = entry.getKey();
                     int lvl = entry.getValue();
-                    if (version >= 16 && e.equals(Enchantment.SOUL_SPEED) && !table.equals(LootTables.BASTION_OTHER.getLootTable()))
+                    if (VersionUtils.SERVER_VERSION >= 16 && e.equals(Enchantment.SOUL_SPEED) && !table.equals(LootTables.BASTION_OTHER.getLootTable()))
                         continue;
                     randRange -= 10;
                     if (randRange < 0) {
@@ -354,19 +349,5 @@ public class EnchantmentGenerator {
     public void setXpSeed(Player enchanter, int seed) {
         NamespacedKey key = new NamespacedKey(EnchantmentCore.getInstance(), "xp_seed");
         enchanter.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, seed);
-    }
-
-    /**
-     * <p>Gets the numeric Minecraft version of the generator.</p>
-     * <p>The Minecraft version number is based on the major release of Minecraft. For example:</p>
-     * <ul>
-     * <li>In version <code>"1.13.2"</code>, it will return <code>13</code></li>
-     * <li>In version <code>"1.16"</code>, will return <code>16</code></li>
-     * </ul>
-     *
-     * @return The current Minecraft version number of the generator
-     */
-    public int getMinecraftVersion() {
-        return version;
     }
 }
