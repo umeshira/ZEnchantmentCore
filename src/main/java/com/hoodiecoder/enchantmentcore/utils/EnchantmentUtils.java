@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -70,27 +71,47 @@ public class EnchantmentUtils {
     }
 
     /**
-     * Creates item lore for enchantments and their levels based on current item lore.
+     * Update the lore of the item meta
      *
-     * @param enchs       The enchantments and levels to add
-     * @param currentLore Current item lore to combine with
-     * @return Lore created from the given enchantments
+     * @param meta the item meta
      */
-    public static List<String> createLore(Map<Enchantment, Integer> enchs, List<String> currentLore) {
-        List<String> lore = new LinkedList<>();
-        for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
-            if (e.getKey() instanceof CustomEnch) {
-                lore.add(createLoreLine((CustomEnch) e.getKey(), e.getValue()));
-            }
+    public static void updateItemLore(ItemMeta meta) {
+        if (meta == null) {
+            return;
         }
-        if (currentLore != null) {
-            for (String str : currentLore) {
-                if (!str.endsWith(enchCode)) {
-                    lore.add(str);
+
+        // Load enchants
+        Map<Enchantment, Integer> enchs;
+        if (meta instanceof EnchantmentStorageMeta) {
+            enchs = ((EnchantmentStorageMeta) meta).getStoredEnchants();
+        } else {
+            enchs = meta.getEnchants();
+        }
+
+        // Create enchant lore
+        List<String> createdLore = new ArrayList<>();
+        if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) { // Only add lore if the item doesn't hide enchants
+            for (Entry<Enchantment, Integer> e : enchs.entrySet()) {
+                if (e.getKey() instanceof CustomEnch) {
+                    createdLore.add(createLoreLine((CustomEnch) e.getKey(), e.getValue()));
                 }
             }
         }
-        return lore;
+
+        // Add current lore
+        List<String> currentLore = meta.getLore();
+        if (currentLore != null) {
+            for (String str : currentLore) {
+                if (!str.endsWith(enchCode)) { // Should not contain enchant lore
+                    createdLore.add(str);
+                }
+            }
+        }
+
+        // Set lore to item meta
+        if (!createdLore.equals(currentLore)) {
+            meta.setLore(createdLore);
+        }
     }
 
     /**

@@ -298,15 +298,7 @@ public class EnchantmentCore extends JavaPlugin {
                 }
                 return true;
             }
-            List<String> lore = meta.getLore();
-            if (lore == null) {
-                lore = new LinkedList<>();
-            }
-            Map<Enchantment, Integer> enchMap = new HashMap<>();
-            enchMap.put(ench, lvl);
-            List<String> createdLore = EnchantmentUtils.createLore(enchMap, lore);
-            lore.addAll(0, createdLore);
-            meta.setLore(lore);
+            EnchantmentUtils.updateItemLore(meta);
             item.setItemMeta(meta);
         }
         return true;
