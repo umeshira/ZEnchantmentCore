@@ -2,7 +2,6 @@ package com.hoodiecoder.enchantmentcore;
 
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 import com.hoodiecoder.enchantmentcore.utils.EnchantmentUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -30,7 +29,6 @@ public abstract class CustomEnch extends Enchantment {
     private static final Field byKeyField;
     private static final Field byNameField;
 
-    private static final List<NamespacedKey> reservedKeys = new ArrayList<>();
     private static final List<CustomEnch> pendingEnchants = new ArrayList<>();
     private static final Map<NamespacedKey, CustomEnch> byKey = new LinkedHashMap<>();
     private static final Map<String, CustomEnch> byName = new LinkedHashMap<>();
@@ -58,7 +56,6 @@ public abstract class CustomEnch extends Enchantment {
     }
 
     private final int coreID;
-    private final String intName;
     private final Plugin ownerPlugin;
     private boolean disabled = false;
 
@@ -70,33 +67,17 @@ public abstract class CustomEnch extends Enchantment {
      * @param identifier the internal ID of the enchantment
      */
     public CustomEnch(EnchantmentHolder holder, String identifier) {
-        super(NamespacedKey.minecraft(returnValid(identifier)));
-        reservedKeys.add(getKey());
+        super(new NamespacedKey(holder.getOwnerPlugin(), identifier));
         coreID = nextID;
         nextID++;
-        intName = getKey().getKey();
         ownerPlugin = holder.getOwnerPlugin();
         holder.addEnchant(this);
     }
 
-    private static String returnValid(String str) {
-        int placeholderVal = 1;
-        String finalStr = str;
-        while (Enchantment.getByKey(NamespacedKey.minecraft(finalStr)) != null || reservedKeys.contains(NamespacedKey.minecraft(finalStr))) {
-            finalStr = str + "_" + placeholderVal;
-            placeholderVal++;
-        }
-        return finalStr;
-    }
-
     static void batchRegister() {
-        batchRegister(pendingEnchants);
-    }
-
-    static void batchRegister(List<CustomEnch> list) {
-        list.sort(Comparator.comparingInt(CustomEnch::getPriority));
-        Collections.reverse(list);
-        for (CustomEnch ce : list) {
+        pendingEnchants.sort(Comparator.comparingInt(CustomEnch::getPriority));
+        Collections.reverse(pendingEnchants);
+        for (CustomEnch ce : pendingEnchants) {
             ce.registerEnchantment();
         }
     }
@@ -294,7 +275,7 @@ public abstract class CustomEnch extends Enchantment {
      */
     @Override
     public String getName() {
-        return intName.toUpperCase();
+        return getKey().getKey().toUpperCase();
     }
 
     /**
@@ -382,16 +363,6 @@ public abstract class CustomEnch extends Enchantment {
     @Override
     public boolean isTreasure() {
         return false;
-    }
-
-    /**
-     * <p>Gets the display name of this enchantment that appears in item lore. This includes the color prefix for the enchantment.</p>
-     *
-     * @return The lore display name of the enchantment
-     * @see #getDisplayName()
-     */
-    public final String getLoreName() {
-        return (isCursed() ? ChatColor.RED : ChatColor.GRAY) + getDisplayName();
     }
 
     /**
