@@ -220,19 +220,25 @@ public abstract class CustomEnch extends Enchantment {
      * @return List containing all applicable equipment slots
      * @see #getItemTarget()
      */
-    public final EquipmentSlot[] getEquipmentSlot() {
+    public final Set<EquipmentSlot> getEquipmentSlot() {
+        EquipmentSlot[] slots;
         switch (getItemTarget()) {
             case ARMOR:
             case WEARABLE:
-                return new EquipmentSlot[]{EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.HEAD};
+                slots = new EquipmentSlot[]{EquipmentSlot.CHEST, EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.HEAD};
+                break;
             case ARMOR_TORSO:
-                return new EquipmentSlot[]{EquipmentSlot.CHEST};
+                slots = new EquipmentSlot[]{EquipmentSlot.CHEST};
+                break;
             case ARMOR_FEET:
-                return new EquipmentSlot[]{EquipmentSlot.FEET};
+                slots = new EquipmentSlot[]{EquipmentSlot.FEET};
+                break;
             case ARMOR_HEAD:
-                return new EquipmentSlot[]{EquipmentSlot.HEAD};
+                slots = new EquipmentSlot[]{EquipmentSlot.HEAD};
+                break;
             case ARMOR_LEGS:
-                return new EquipmentSlot[]{EquipmentSlot.LEGS};
+                slots = new EquipmentSlot[]{EquipmentSlot.LEGS};
+                break;
             case BOW:
             case BREAKABLE:
             case CROSSBOW:
@@ -242,8 +248,10 @@ public abstract class CustomEnch extends Enchantment {
             case VANISHABLE:
             case WEAPON:
             default:
-                return new EquipmentSlot[]{EquipmentSlot.HAND};
+                slots = new EquipmentSlot[]{EquipmentSlot.HAND};
+                break;
         }
+        return new HashSet<>(Arrays.asList(slots));
     }
 
     /**

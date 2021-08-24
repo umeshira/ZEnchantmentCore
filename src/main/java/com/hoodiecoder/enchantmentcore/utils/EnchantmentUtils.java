@@ -8,6 +8,7 @@ import com.hoodiecoder.enchantmentcore.utils.EnchEnums.MaterialType;
 import com.hoodiecoder.enchantmentcore.utils.EnchEnums.Rarity;
 import com.hoodiecoder.enchantmentcore.utils.lore.DefaultLoreHandler;
 import com.hoodiecoder.enchantmentcore.utils.lore.LoreHandler;
+import com.hoodiecoder.enchantmentcore.utils.lore.PaperLoreHandler;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -53,6 +54,7 @@ public class EnchantmentUtils {
         }
 
         LORE_HANDLER_LIST.add(new DefaultLoreHandler());
+        LORE_HANDLER_LIST.add(new PaperLoreHandler());
     }
 
     /**

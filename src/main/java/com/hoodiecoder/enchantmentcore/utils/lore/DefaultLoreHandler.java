@@ -1,14 +1,12 @@
 package com.hoodiecoder.enchantmentcore.utils.lore;
 
 import com.hoodiecoder.enchantmentcore.CustomEnch;
+import com.hoodiecoder.enchantmentcore.paper.PaperCustomEnch;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The default {@link LoreHandler} that works on Spigot and its forks
@@ -47,10 +45,16 @@ public class DefaultLoreHandler implements LoreHandler {
 
     @Override
     public Map<CustomEnch, Integer> updateItemLore(ItemMeta meta, Map<CustomEnch, Integer> currentEnchantMap) {
+        Map<CustomEnch, Integer> remaining = new HashMap<>();
         // Create enchant lore
         List<String> createdLore = new ArrayList<>();
         if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) { // Only add lore if the item doesn't hide enchants
-            currentEnchantMap.forEach((ench, level) -> createdLore.add(createLoreLine(ench, level)));
+            currentEnchantMap.forEach((ench, level) -> {
+                if (!(ench instanceof PaperCustomEnch))
+                    createdLore.add(createLoreLine(ench, level));
+                else
+                    remaining.put(ench, level);
+            });
         }
 
         // Add current lore
@@ -68,6 +72,6 @@ public class DefaultLoreHandler implements LoreHandler {
             meta.setLore(createdLore);
         }
 
-        return Collections.emptyMap();
+        return remaining;
     }
 }

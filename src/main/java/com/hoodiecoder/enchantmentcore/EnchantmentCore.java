@@ -70,6 +70,7 @@ public class EnchantmentCore extends JavaPlugin {
                 m.disablePlugin(this);
                 return;
         }
+        getLogger().info("Running ZEnchantmentCore on environment " + VersionUtils.BUKKIT_TYPE + " 1." + VersionUtils.SERVER_VERSION);
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
         reloadableEnable(false);
@@ -314,12 +315,12 @@ public class EnchantmentCore extends JavaPlugin {
             }
             StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
         } else if (args.length == 2) {
-
+            final List<NamespacedKey> keys = new ArrayList<>();
             for (Enchantment ench : includeVanilla ? Enchantment.values() : CustomEnch.values()) {
                 if (!(ench instanceof CustomEnch) || !((CustomEnch) ench).isDisabled())
-                    COMMANDS.add(ench.getKey().toString());
+                    keys.add(ench.getKey());
             }
-            StringUtil.copyPartialMatches(args[1], COMMANDS, completions);
+            keyCompletions(args[1], keys, completions);
         } else if (args.length == 3) {
             Enchantment ench = Enchantment.getByKey(NamespacedKey.fromString(args[1]));
             if (ench == null) return completions;
@@ -329,6 +330,14 @@ public class EnchantmentCore extends JavaPlugin {
             StringUtil.copyPartialMatches(args[2], COMMANDS, completions);
         }
         return completions;
+    }
+
+    private void keyCompletions(String arg, List<NamespacedKey> keys, List<String> completions) {
+        arg = arg.toLowerCase();
+        for (NamespacedKey key : keys) {
+            if (key.getNamespace().startsWith(arg) || key.getKey().startsWith(arg))
+                completions.add(key.toString());
+        }
     }
 
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
@@ -346,10 +355,10 @@ public class EnchantmentCore extends JavaPlugin {
                         case "enchant":
                             return enchantComplete(Arrays.copyOfRange(args, 1, args.length), false);
                         case "info":
-                            COMMANDS = new ArrayList<>();
+                            final List<NamespacedKey> keys = new ArrayList<>();
                             for (CustomEnch ench : CustomEnch.values())
-                                COMMANDS.add(ench.getKey().toString());
-                            StringUtil.copyPartialMatches(args[1], COMMANDS, completions);
+                                keys.add(ench.getKey());
+                            keyCompletions(args[1], keys, completions);
                             break;
                         case "reload":
                         case "check":
