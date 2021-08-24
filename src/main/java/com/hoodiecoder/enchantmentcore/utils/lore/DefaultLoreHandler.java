@@ -2,12 +2,11 @@ package com.hoodiecoder.enchantmentcore.utils.lore;
 
 import com.hoodiecoder.enchantmentcore.CustomEnch;
 import org.bukkit.ChatColor;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,23 +46,11 @@ public class DefaultLoreHandler implements LoreHandler {
     }
 
     @Override
-    public void updateItemLore(ItemMeta meta) {
-        // Load enchants
-        Map<Enchantment, Integer> enchs;
-        if (meta instanceof EnchantmentStorageMeta) {
-            enchs = ((EnchantmentStorageMeta) meta).getStoredEnchants();
-        } else {
-            enchs = meta.getEnchants();
-        }
-
+    public Map<CustomEnch, Integer> updateItemLore(ItemMeta meta, Map<CustomEnch, Integer> currentEnchantMap) {
         // Create enchant lore
         List<String> createdLore = new ArrayList<>();
         if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) { // Only add lore if the item doesn't hide enchants
-            for (Map.Entry<Enchantment, Integer> e : enchs.entrySet()) {
-                if (e.getKey() instanceof CustomEnch) {
-                    createdLore.add(createLoreLine((CustomEnch) e.getKey(), e.getValue()));
-                }
-            }
+            currentEnchantMap.forEach((ench, level) -> createdLore.add(createLoreLine(ench, level)));
         }
 
         // Add current lore
@@ -80,5 +67,7 @@ public class DefaultLoreHandler implements LoreHandler {
         if (!createdLore.equals(currentLore)) {
             meta.setLore(createdLore);
         }
+
+        return Collections.emptyMap();
     }
 }

@@ -16,21 +16,22 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
  * Utility class containing several useful methods for using the plugin, as well as manipulating and working with enchantments.
  */
 public class EnchantmentUtils {
+    /**
+     * The list of registered lore handlers. Can be modified
+     */
+    public static final List<LoreHandler> LORE_HANDLER_LIST = new LinkedList<>();
+
     private static final List<Enchantment> COMMON;
     private static final List<Enchantment> UNCOMMON;
     private static final List<Enchantment> RARE;
     private static final List<Enchantment> VERY_RARE;
-    private static LoreHandler loreHandler = new DefaultLoreHandler();
 
     static {
         int mcVersion = VersionUtils.SERVER_VERSION;
@@ -50,6 +51,8 @@ public class EnchantmentUtils {
             RARE = Arrays.asList(Enchantment.PROTECTION_EXPLOSIONS, Enchantment.OXYGEN, Enchantment.WATER_WORKER, Enchantment.DEPTH_STRIDER, Enchantment.FROST_WALKER, Enchantment.FIRE_ASPECT, Enchantment.LOOT_BONUS_MOBS, Enchantment.SWEEPING_EDGE, Enchantment.LOOT_BONUS_BLOCKS, Enchantment.ARROW_KNOCKBACK, Enchantment.ARROW_FIRE, Enchantment.LUCK, Enchantment.LURE, Enchantment.IMPALING, Enchantment.RIPTIDE, Enchantment.MENDING);
             VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
         }
+
+        LORE_HANDLER_LIST.add(new DefaultLoreHandler());
     }
 
     /**
@@ -58,27 +61,30 @@ public class EnchantmentUtils {
      * @param meta the item meta
      */
     public static void updateItemLore(ItemMeta meta) {
-        if (meta != null) {
-            loreHandler.updateItemLore(meta);
+        if (meta == null) {
+            return;
         }
-    }
 
-    /**
-     * Get the lore handler
-     *
-     * @return the lore handler
-     */
-    public static LoreHandler getLoreHandler() {
-        return loreHandler;
-    }
+        // Load enchants
+        Map<Enchantment, Integer> enchs;
+        if (meta instanceof EnchantmentStorageMeta) {
+            enchs = ((EnchantmentStorageMeta) meta).getStoredEnchants();
+        } else {
+            enchs = meta.getEnchants();
+        }
 
-    /**
-     * Set the lore handler
-     *
-     * @param loreHandler the lore handler
-     */
-    public static void setLoreHandler(LoreHandler loreHandler) {
-        EnchantmentUtils.loreHandler = loreHandler;
+        // Filter the custom enchantments
+        Map<CustomEnch, Integer> customEnchs = new HashMap<>();
+        for (Map.Entry<Enchantment, Integer> entry : enchs.entrySet()) {
+            if (entry.getKey() instanceof CustomEnch) {
+                customEnchs.put((CustomEnch) entry.getKey(), entry.getValue());
+            }
+        }
+
+        // Update the lore
+        for (LoreHandler loreHandler : LORE_HANDLER_LIST) {
+            customEnchs = loreHandler.updateItemLore(meta, customEnchs);
+        }
     }
 
     /**
@@ -100,7 +106,7 @@ public class EnchantmentUtils {
         } else if (VERY_RARE.contains(ench)) {
             return Rarity.VERY_RARE;
         } else {
-            return null;
+            return Rarity.UNFINDABLE;
         }
     }
 
@@ -114,7 +120,7 @@ public class EnchantmentUtils {
 
     public static int getAnvilBookMultiplier(Enchantment ench) {
         try {
-            return (int) Math.ceil(Math.pow(2, getRarity(ench).ordinal() - 1));
+            return (int) Math.ceil(Math.pow(2, getRarity(ench).ordinal() - 1D));
         } catch (NullPointerException e) {
             return 1;
         }
