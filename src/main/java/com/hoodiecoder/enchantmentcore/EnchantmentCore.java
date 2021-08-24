@@ -136,7 +136,7 @@ public class EnchantmentCore extends JavaPlugin {
                         case "list":
                             if (sender.hasPermission("zenchantmentcore.util")) {
                                 sender.sendMessage(messagePrefix + "List of enchantments: " + (CustomEnch.values().length == 0 ? "None." : ""));
-                                for (CustomEnch ce : Stream.of(CustomEnch.allValues()).sorted(Comparator.comparing(ce -> ce.getKey().getKey())).collect(Collectors.toList())) {
+                                for (CustomEnch ce : Stream.of(CustomEnch.allValues()).sorted(Comparator.comparing(ce -> ce.getKey().toString())).collect(Collectors.toList())) {
                                     ChatColor chatColor;
                                     String levelRange;
                                     if (ce.isDisabled()) {
@@ -175,7 +175,7 @@ public class EnchantmentCore extends JavaPlugin {
                                         }
                                         for (Entry<Enchantment, Integer> entry : enchs.entrySet()) {
                                             Enchantment ench = entry.getKey();
-                                            messages.add(ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + ench.getKey().getKey().toLowerCase() + " " + entry.getValue());
+                                            messages.add(ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + ench.getKey() + " " + entry.getValue());
                                         }
                                         if (messages.isEmpty()) {
                                             sender.sendMessage(messagePrefix + "Enchantments on main hand: None.");
@@ -211,7 +211,7 @@ public class EnchantmentCore extends JavaPlugin {
                                 sender.sendMessage(messagePrefix + "Invalid permission.");
                                 break;
                             }
-                            CustomEnch ench = CustomEnch.getByKey(NamespacedKey.minecraft(args[1]));
+                            CustomEnch ench = CustomEnch.getByKey(NamespacedKey.fromString(args[1]));
                             if (ench == null) {
                                 sender.sendMessage(messagePrefix + "Invalid custom enchantment.");
                                 break;
@@ -255,7 +255,7 @@ public class EnchantmentCore extends JavaPlugin {
                 sender.sendMessage(messagePrefix + "That player is not online.");
                 return true;
             }
-            Enchantment ench = Enchantment.getByKey(NamespacedKey.minecraft(args[1]));
+            Enchantment ench = Enchantment.getByKey(NamespacedKey.fromString(args[1]));
             if (ench == null || (!includeVanilla && !(ench instanceof CustomEnch)) || (ench instanceof CustomEnch && ((CustomEnch) ench).isDisabled())) {
                 sender.sendMessage(messagePrefix + "Invalid" + (includeVanilla ? "" : " or vanilla") + " enchantment.");
                 return true;
@@ -317,11 +317,11 @@ public class EnchantmentCore extends JavaPlugin {
 
             for (Enchantment ench : includeVanilla ? Enchantment.values() : CustomEnch.values()) {
                 if (!(ench instanceof CustomEnch) || !((CustomEnch) ench).isDisabled())
-                    COMMANDS.add(ench.getKey().getKey().toLowerCase());
+                    COMMANDS.add(ench.getKey().toString());
             }
             StringUtil.copyPartialMatches(args[1], COMMANDS, completions);
         } else if (args.length == 3) {
-            Enchantment ench = Enchantment.getByKey(NamespacedKey.minecraft(args[1]));
+            Enchantment ench = Enchantment.getByKey(NamespacedKey.fromString(args[1]));
             if (ench == null) return completions;
             for (int i = 1; i <= ench.getMaxLevel(); i++) {
                 COMMANDS.add(Integer.toString(i));
@@ -348,7 +348,7 @@ public class EnchantmentCore extends JavaPlugin {
                         case "info":
                             COMMANDS = new ArrayList<>();
                             for (CustomEnch ench : CustomEnch.values())
-                                COMMANDS.add(ench.getKey().getKey().toLowerCase());
+                                COMMANDS.add(ench.getKey().toString());
                             StringUtil.copyPartialMatches(args[1], COMMANDS, completions);
                             break;
                         case "reload":
@@ -363,7 +363,7 @@ public class EnchantmentCore extends JavaPlugin {
             case "enchant":
                 return enchantComplete(args, true);
             default:
-                return new ArrayList<>();
+                return Collections.emptyList();
         }
     }
 

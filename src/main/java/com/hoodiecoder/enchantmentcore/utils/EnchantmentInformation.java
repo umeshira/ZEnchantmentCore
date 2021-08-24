@@ -80,7 +80,7 @@ public class EnchantmentInformation {
     public String toString() {
         List<String> strlist = new ArrayList<>();
         for (Enchantment ench : enchs) {
-            strlist.add(ench.getKey().getKey());
+            strlist.add(ench.getKey().toString());
         }
         return "EnchantmentInformation[" + strlist + ", " + levels + ", " + cost + "]";
     }

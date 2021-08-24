@@ -38,10 +38,11 @@ public class DefaultLoreHandler implements LoreHandler {
      */
     public static String createLoreLine(CustomEnch ce, int lvl) {
         String endCode = ENCH_CODE;
+        String loreName = (ce.isCursed() ? ChatColor.RED : ChatColor.GRAY) + ce.getDisplayName();
         if (ce.getMaxLevel() > 1) {
-            return (ce.getLoreName() + " " + getRomanNumeral(lvl) + endCode);
+            return (loreName + " " + getRomanNumeral(lvl) + endCode);
         } else {
-            return (ce.getLoreName() + endCode);
+            return (loreName + endCode);
         }
     }
 
