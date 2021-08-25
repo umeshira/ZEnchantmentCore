@@ -22,15 +22,16 @@ public class PaperLoreHandler implements LoreHandler {
         Map<CustomEnch, Integer> remaining = new HashMap<>();
         // Create enchant lore
         List<Component> createdLore = new ArrayList<>();
-        if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) { // Only add lore if the item doesn't hide enchants
-            currentEnchantMap.forEach((ench, level) -> {
-                if (ench instanceof PaperCustomEnch) {
+        boolean showEnchants = !meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS); // Only add lore if the item doesn't hide enchants
+        currentEnchantMap.forEach((ench, level) -> {
+            if (ench instanceof PaperCustomEnch) {
+                if (showEnchants) {
                     createdLore.add(ench.displayName(level).append(ENCH_CODE));
-                } else {
-                    remaining.put(ench, level);
                 }
-            });
-        }
+            } else {
+                remaining.put(ench, level);
+            }
+        });
 
         // Add current lore
         List<Component> currentLore = meta.lore();
