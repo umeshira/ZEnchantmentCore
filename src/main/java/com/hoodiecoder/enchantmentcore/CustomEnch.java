@@ -61,7 +61,6 @@ public abstract class CustomEnch extends Enchantment {
 
     /**
      * <p>Creates a new instance of a <code>CustomEnch</code> with an {@link EnchantmentHolder} and the identifier of the enchantment.</p>
-     * <p>The identifier must not already be registered in minecraft as an enchantment, or it will be replaced with a placeholder identifier.</p>
      *
      * @param holder     the <code>EnchantmentHolder</code> for the enchantment
      * @param identifier the internal ID of the enchantment
