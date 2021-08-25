@@ -55,25 +55,25 @@ public class CustomEnchListener implements Listener {
         switch (ench.getItemTarget()) {
             case ARMOR_FEET:
                 ItemStack feet = entityEquipment.getBoots();
-                if (feet != null && ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
+                if (feet != null && feet.getItemMeta() != null && ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{feet};
                 }
                 break;
             case ARMOR_HEAD:
                 ItemStack head = entityEquipment.getHelmet();
-                if (head != null && ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
+                if (head != null && head.getItemMeta() != null && ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{head};
                 }
                 break;
             case ARMOR_LEGS:
                 ItemStack legs = entityEquipment.getLeggings();
-                if (legs != null && ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
+                if (legs != null && legs.getItemMeta() != null && ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{legs};
                 }
                 break;
             case ARMOR_TORSO:
                 ItemStack chest = entityEquipment.getChestplate();
-                if (chest != null && ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
+                if (chest != null && chest.getItemMeta() != null && ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{chest};
                 }
                 break;
@@ -82,7 +82,7 @@ public class CustomEnchListener implements Listener {
                 ItemStack[] armorArr = entityEquipment.getArmorContents();
                 List<ItemStack> armor = new ArrayList<>();
                 for (ItemStack a : armorArr) {
-                    if (a != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
+                    if (a != null && a.getItemMeta() != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
                         armor.add(a);
                     }
                 }
@@ -100,10 +100,10 @@ public class CustomEnchListener implements Listener {
                 List<ItemStack> itemS = new ArrayList<>();
                 ItemStack itemMain = entityEquipment.getItemInMainHand();
                 ItemStack itemOff = entityEquipment.getItemInOffHand();
-                if (itemMain.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemMain)) {
+                if (itemMain.getItemMeta() != null && itemMain.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemMain)) {
                     itemS.add(itemMain);
                 }
-                if (itemOff.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemOff)) {
+                if (itemOff.getItemMeta() != null && itemOff.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemOff)) {
                     itemS.add(itemOff);
                 }
                 if (!itemS.isEmpty()) {
@@ -170,7 +170,7 @@ public class CustomEnchListener implements Listener {
     @EventHandler
     public void onEvent(org.bukkit.event.entity.EntityTargetEvent event) {
         if (event.getTarget() instanceof LivingEntity) {
-            LivingEntity entity = (LivingEntity) event.getEntity();
+            LivingEntity entity = (LivingEntity) event.getTarget();
             executeEnchantEvent(entity, TargetHandler.class, (handler, levels, itemStacks) -> handler.onTargeted(entity, levels, itemStacks, event));
         }
     }
@@ -178,7 +178,7 @@ public class CustomEnchListener implements Listener {
     @EventHandler
     public void onEvent(org.bukkit.event.entity.ProjectileHitEvent event) {
         if (event.getHitEntity() instanceof LivingEntity) {
-            LivingEntity entity = (LivingEntity) event.getEntity();
+            LivingEntity entity = (LivingEntity) event.getHitEntity();
             executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onHit(entity, levels, itemStacks, event));
         }
     }
