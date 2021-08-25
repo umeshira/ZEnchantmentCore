@@ -12,8 +12,6 @@ import org.bukkit.entity.EntityCategory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,7 +37,7 @@ public abstract class PaperCustomEnch extends CustomEnch {
      */
     public @NotNull Component displayName() {
         return Component.text(getDisplayName());
-    };
+    }
 
     @Override
     public final @NotNull Component displayName(int level) {

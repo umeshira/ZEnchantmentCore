@@ -6,7 +6,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The default {@link LoreHandler} that works on Spigot and its forks

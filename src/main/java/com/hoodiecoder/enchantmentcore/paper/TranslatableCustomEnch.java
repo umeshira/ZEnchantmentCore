@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An extension of <code>PaperCustomEnch</code> that uses a translatable key, for use with resource packs.
+ *
  * @see PaperCustomEnch
  */
 public abstract class TranslatableCustomEnch extends PaperCustomEnch {

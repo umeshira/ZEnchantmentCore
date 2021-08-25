@@ -6,12 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PaperLoreHandler implements LoreHandler {
     private static final String[] numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
