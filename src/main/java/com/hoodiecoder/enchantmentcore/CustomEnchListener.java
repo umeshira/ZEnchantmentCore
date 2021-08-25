@@ -1,16 +1,13 @@
 package com.hoodiecoder.enchantmentcore;
 
-import com.hoodiecoder.enchantmentcore.utils.EnchEnums.ListenerType;
+import com.hoodiecoder.enchantmentcore.enchant.*;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -31,182 +28,58 @@ public class CustomEnchListener implements Listener {
         console = implementer.getServer().getConsoleSender();
     }
 
-    private static Entity getEntityFromType(ListenerType ltype, Event event) {
-        Entity entityPlayer = null;
-        switch (ltype) {
-            case ENTITY_TAKE_DAMAGE:
-            case ENTITY_AIR:
-            case ENTITY_DEATH:
-            case ENTITY_DROP:
-            case ENTITY_INTERACT:
-            case ENTITY_POTION:
-            case ENTITY_REGAIN_HEALTH:
-            case ENTITY_SHOOT_BOW:
-                entityPlayer = ((EntityEvent) event).getEntity();
-                break;
-            case ENTITY_DEAL_DAMAGE:
-                entityPlayer = ((EntityDamageByEntityEvent) event).getDamager();
-                break;
-            case ENTITY_BECOME_TARGETED:
-                entityPlayer = ((org.bukkit.event.entity.EntityTargetEvent) event).getTarget();
-                break;
-            case ENTITY_HIT_PROJECTILE:
-                entityPlayer = ((org.bukkit.event.entity.ProjectileHitEvent) event).getHitEntity();
-                break;
-            case ENTITY_BREAK_BLOCK:
-                entityPlayer = ((org.bukkit.event.block.BlockBreakEvent) event).getPlayer();
-                break;
-            case ENTITY_PLACE_BLOCK:
-                entityPlayer = ((org.bukkit.event.block.BlockPlaceEvent) event).getPlayer();
-                break;
-            case PLAYER_EXP_EVENT:
-            case PLAYER_FISH_EVENT:
-                entityPlayer = ((org.bukkit.event.player.PlayerEvent) event).getPlayer();
-                break;
-            default:
-                break;
-
-        }
-        return entityPlayer;
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityDeathEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityAirChangeEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityDropItemEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityInteractEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityPotionEffectEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityShootBowEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityRegainHealthEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityTargetEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.ProjectileHitEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.block.BlockBreakEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.block.BlockPlaceEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.player.PlayerFishEvent event) {
-        runApplicableTypes(event);
-
-    }
-
-    @EventHandler
-    public void onEvent(org.bukkit.event.player.PlayerExpChangeEvent event) {
-        runApplicableTypes(event);
-    }
-
-    private void runApplicableTypes(Event event) {
-        List<ListenerType> ltypes = new ArrayList<>();
-        for (ListenerType lt : ListenerType.values()) {
-            if (lt.getEventClass().isInstance(event)) {
-                ltypes.add(lt);
+    public static <T> void executeEnchantEvent(LivingEntity livingEntity, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
+        EntityEquipment entityEquipment = livingEntity.getEquipment();
+        Arrays.stream(CustomEnch.values()).forEach(customEnch -> {
+            if (!handlerClass.isInstance(customEnch)) {
+                return;
             }
-        }
-        for (ListenerType lt : ltypes) {
-            runEnchEvent(event, lt);
-        }
+            T handler = handlerClass.cast(customEnch);
+            ItemStack[] applicableItems = getApplicableItems(customEnch, entityEquipment);
+            if (applicableItems.length <= 0) {
+                return;
+            }
+            List<Integer> levels = new ArrayList<>();
+            List<ItemStack> items = new ArrayList<>();
+            for (ItemStack o : applicableItems) {
+                items.add(o);
+                levels.add(o.getItemMeta().getEnchantLevel(customEnch));
+            }
+            handlerConsumer.accept(handler, levels, items);
+        });
     }
 
-    private void runEnchEvent(Event event, ListenerType lt) {
-        if (lt == null) return;
-        Entity entityPlayer = getEntityFromType(lt, event);
-        if (!(entityPlayer instanceof Player)) {
-            return;
-        }
-        Player player = (Player) entityPlayer;
-        PlayerInventory playerInv = player.getInventory();
-        callEvents(Arrays.asList(CustomEnch.values()), playerInv, event, lt);
-    }
-
-    private ItemStack[] getApplicableItems(CustomEnch ench, PlayerInventory playerInv) {
+    private static ItemStack[] getApplicableItems(CustomEnch ench, EntityEquipment entityEquipment) {
         ItemStack[] applicableItems = new ItemStack[0];
         if (ench.isDisabled()) return applicableItems;
         switch (ench.getItemTarget()) {
             case ARMOR_FEET:
-                ItemStack feet = playerInv.getBoots();
-                if (ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
+                ItemStack feet = entityEquipment.getBoots();
+                if (feet != null && ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{feet};
                 }
                 break;
             case ARMOR_HEAD:
-                ItemStack head = playerInv.getHelmet();
-                if (ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
+                ItemStack head = entityEquipment.getHelmet();
+                if (head != null && ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{head};
                 }
                 break;
             case ARMOR_LEGS:
-                ItemStack legs = playerInv.getLeggings();
-                if (ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
+                ItemStack legs = entityEquipment.getLeggings();
+                if (legs != null && ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{legs};
                 }
                 break;
             case ARMOR_TORSO:
-                ItemStack chest = playerInv.getChestplate();
-                if (ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
+                ItemStack chest = entityEquipment.getChestplate();
+                if (chest != null && ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
                     applicableItems = new ItemStack[]{chest};
                 }
                 break;
             case ARMOR:
             case WEARABLE:
-                ItemStack[] armorArr = playerInv.getArmorContents();
+                ItemStack[] armorArr = entityEquipment.getArmorContents();
                 List<ItemStack> armor = new ArrayList<>();
                 for (ItemStack a : armorArr) {
                     if (a != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
@@ -225,12 +98,12 @@ public class CustomEnchListener implements Listener {
             case WEAPON:
             case BREAKABLE:
                 List<ItemStack> itemS = new ArrayList<>();
-                ItemStack itemMain = playerInv.getItemInMainHand();
-                ItemStack itemOff = playerInv.getItemInOffHand();
-                if (ench.canEnchantItem(itemMain) && itemMain.getItemMeta().hasEnchant(ench)) {
+                ItemStack itemMain = entityEquipment.getItemInMainHand();
+                ItemStack itemOff = entityEquipment.getItemInOffHand();
+                if (itemMain.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemMain)) {
                     itemS.add(itemMain);
                 }
-                if (ench.canEnchantItem(itemOff) && itemOff.getItemMeta().hasEnchant(ench)) {
+                if (itemOff.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemOff)) {
                     itemS.add(itemOff);
                 }
                 if (!itemS.isEmpty()) {
@@ -243,67 +116,106 @@ public class CustomEnchListener implements Listener {
         return applicableItems;
     }
 
-    private void callEvents(List<CustomEnch> listEnchs, PlayerInventory playerInv, Event event, ListenerType ltype) {
-        for (CustomEnch ce : listEnchs) {
-            ItemStack[] applicableItems = getApplicableItems(ce, playerInv);
-            if (applicableItems.length > 0) {
-                List<Integer> levels = new ArrayList<>();
-                List<ItemStack> items = new ArrayList<>();
-                for (ItemStack o : applicableItems) {
-                    items.add(o);
-                    levels.add(o.getItemMeta().getEnchantLevel(ce));
-                }
-                switch (ltype) {
-                    case ENTITY_AIR:
-                        ce.onAir((org.bukkit.event.entity.EntityAirChangeEvent) event, levels, items);
-                        break;
-                    case ENTITY_BECOME_TARGETED:
-                        ce.onTargeted((org.bukkit.event.entity.EntityTargetEvent) event, levels, items);
-                        break;
-                    case ENTITY_BREAK_BLOCK:
-                        ce.onBreakBlock((org.bukkit.event.block.BlockBreakEvent) event, levels, items);
-                        break;
-                    case ENTITY_DEAL_DAMAGE:
-                        ce.onDealDamage((org.bukkit.event.entity.EntityDamageByEntityEvent) event, levels, items);
-                        break;
-                    case ENTITY_DEATH:
-                        ce.onDeath((org.bukkit.event.entity.EntityDeathEvent) event, levels, items);
-                        break;
-                    case ENTITY_DROP:
-                        ce.onDropItem((org.bukkit.event.entity.EntityDropItemEvent) event, levels, items);
-                        break;
-                    case ENTITY_HIT_PROJECTILE:
-                        ce.onHit((org.bukkit.event.entity.ProjectileHitEvent) event, levels, items);
-                        break;
-                    case ENTITY_INTERACT:
-                        ce.onInteract((org.bukkit.event.entity.EntityInteractEvent) event, levels, items);
-                        break;
-                    case ENTITY_PLACE_BLOCK:
-                        ce.onPlaceBlock((org.bukkit.event.block.BlockPlaceEvent) event, levels, items);
-                        break;
-                    case ENTITY_POTION:
-                        ce.onPotionReceived((org.bukkit.event.entity.EntityPotionEffectEvent) event, levels, items);
-                        break;
-                    case ENTITY_REGAIN_HEALTH:
-                        ce.onRegainHealth((org.bukkit.event.entity.EntityRegainHealthEvent) event, levels, items);
-                        break;
-                    case ENTITY_SHOOT_BOW:
-                        ce.onShootBow((org.bukkit.event.entity.EntityShootBowEvent) event, levels, items);
-                        break;
-                    case ENTITY_TAKE_DAMAGE:
-                        ce.onTakeDamage((org.bukkit.event.entity.EntityDamageByEntityEvent) event, levels, items);
-                        break;
-                    case PLAYER_EXP_EVENT:
-                        ce.onGainExp((org.bukkit.event.player.PlayerExpChangeEvent) event, levels, items);
-                        break;
-                    case PLAYER_FISH_EVENT:
-                        ce.onFish((org.bukkit.event.player.PlayerFishEvent) event, levels, items);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityDeathEvent event) {
+        executeEnchantEvent(event.getEntity(), DeathHandler.class, (handler, levels, itemStacks) -> handler.onDeath(event.getEntity(), levels, itemStacks, event));
+    }
 
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityAirChangeEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, AirChangeHandler.class, (handler, levels, itemStacks) -> handler.onAir(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityDropItemEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, DropItemHandler.class, (handler, levels, itemStacks) -> handler.onDropItem(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityInteractEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, InteractHandler.class, (handler, levels, itemStacks) -> handler.onInteract(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityPotionEffectEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, PotionEffectHandler.class, (handler, levels, itemStacks) -> handler.onPotionReceived(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityShootBowEvent event) {
+        LivingEntity entity = event.getEntity();
+        executeEnchantEvent(entity, ShootBowHandler.class, (handler, levels, itemStacks) -> handler.onShootBow(entity, levels, itemStacks, event));
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityRegainHealthEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, RegainHealthHandler.class, (handler, levels, itemStacks) -> handler.onRegainHealth(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityTargetEvent event) {
+        if (event.getTarget() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, TargetHandler.class, (handler, levels, itemStacks) -> handler.onTargeted(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.ProjectileHitEvent event) {
+        if (event.getHitEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onHit(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.block.BlockBreakEvent event) {
+        executeEnchantEvent(event.getPlayer(), BlockHandler.class, (handler, levels, itemStacks) -> handler.onBreakBlock(event.getPlayer(), levels, itemStacks, event));
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.block.BlockPlaceEvent event) {
+        executeEnchantEvent(event.getPlayer(), BlockHandler.class, (handler, levels, itemStacks) -> handler.onPlaceBlock(event.getPlayer(), levels, itemStacks, event));
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getDamager();
+            executeEnchantEvent(entity, DamageHandler.class, (handler, levels, itemStacks) -> handler.onDealDamage(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity();
+            executeEnchantEvent(entity, DamageHandler.class, (handler, levels, itemStacks) -> handler.onTakeDamage(entity, levels, itemStacks, event));
+        }
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.player.PlayerFishEvent event) {
+        executeEnchantEvent(event.getPlayer(), FishHandler.class, (handler, levels, itemStacks) -> handler.onFish(event.getPlayer(), levels, itemStacks, event));
+    }
+
+    @EventHandler
+    public void onEvent(org.bukkit.event.player.PlayerExpChangeEvent event) {
+        executeEnchantEvent(event.getPlayer(), ExpChangeHandler.class, (handler, levels, itemStacks) -> handler.onGainExp(event.getPlayer(), levels, itemStacks, event));
     }
 }
