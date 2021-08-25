@@ -14,7 +14,7 @@ public interface LoreHandler {
      *
      * @param meta              the item meta
      * @param currentEnchantMap the current enchantment map
-     * @return the remaining enchantment map, contains enchantments that can be added to the lore of the meta
+     * @return the remaining enchantment map, contains enchantments that can not be added to the lore of the meta
      */
     Map<CustomEnch, Integer> updateItemLore(ItemMeta meta, Map<CustomEnch, Integer> currentEnchantMap);
 }

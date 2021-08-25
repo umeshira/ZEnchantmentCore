@@ -25,7 +25,7 @@ public class VersionUtils {
      * <p>The Bukkit type that the server is running.</p>
      * <p>Can either be <code>SPIGOT</code>, <code>PAPER</code>, or <code>GENERIC</code>.</p>
      */
-    public static BukkitType BUKKIT_TYPE;
+    public static final BukkitType BUKKIT_TYPE;
 
     static {
         String bukkitVers = Bukkit.getVersion();
@@ -42,17 +42,19 @@ public class VersionUtils {
         } else {
             SERVER_VERSION = -1;
         }
+        BukkitType bukkitType;
         try {
             Class.forName("io.papermc.paper.enchantments.EnchantmentRarity");
-            BUKKIT_TYPE = BukkitType.PAPER;
+            bukkitType = BukkitType.PAPER;
         } catch (ClassNotFoundException e) {
             try {
                 Class.forName("org.bukkit.Server$Spigot");
-                BUKKIT_TYPE = BukkitType.SPIGOT;
+                bukkitType = BukkitType.SPIGOT;
             } catch (ClassNotFoundException e2) {
-                BUKKIT_TYPE = BukkitType.GENERIC;
+                bukkitType = BukkitType.GENERIC;
             }
         }
+        BUKKIT_TYPE = bukkitType;
     }
 
     /**
