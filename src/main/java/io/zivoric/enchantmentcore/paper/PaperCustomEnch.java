@@ -1,9 +1,9 @@
 package io.zivoric.enchantmentcore.paper;
 
+import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.zivoric.enchantmentcore.CustomEnch;
 import io.zivoric.enchantmentcore.EnchantmentHolder;
 import io.zivoric.enchantmentcore.utils.EnchEnums.Rarity;
-import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

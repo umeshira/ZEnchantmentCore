@@ -1,10 +1,8 @@
-name: Build & Deploy
+name: Build & Release
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  release:
+    types: [ published ]
 
 jobs:
   build:
@@ -25,3 +23,12 @@ jobs:
         with:
           name: "ZEnchantmentCore"
           path: "./target/ZEnchantmentCore.jar"
+      - name: Deploy Javadocs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/site/apidocs
+      - name: Publish Package
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
