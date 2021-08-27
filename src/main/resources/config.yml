@@ -3,7 +3,7 @@
 # # # # # # # # # #
 
 # Disables any enchantments in the list, ex. ['zenchantments-basic:life_steal', 'my_plugin:my_enchant']
-disabled-enchantments: []
+disabled-enchantments: [ ]
 
 # # # # # # # # # # #
 # GENERATOR OPTIONS #

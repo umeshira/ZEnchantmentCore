@@ -4,10 +4,10 @@
 
 package io.zivoric.enchantmentcore;
 
+import io.zivoric.enchantmentcore.utils.EnchEnums;
 import io.zivoric.enchantmentcore.utils.EnchantmentInformation;
 import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
 import io.zivoric.enchantmentcore.utils.VersionUtils;
-import io.zivoric.enchantmentcore.utils.EnchEnums;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -205,9 +205,11 @@ public class EnchantmentGenerator {
         int enchantability = 1;
         if (EnchEnums.MaterialType.WOOD.contains(mat) || EnchEnums.MaterialType.LEATHER.contains(mat) || EnchEnums.MaterialType.NETHERITE.contains(mat) || EnchEnums.MaterialType.NETHERITE_ARMOR.contains(mat))
             enchantability = 15;
-        else if (EnchEnums.MaterialType.DIAMOND.contains(mat) || EnchEnums.MaterialType.DIAMOND_ARMOR.contains(mat)) enchantability = 10;
+        else if (EnchEnums.MaterialType.DIAMOND.contains(mat) || EnchEnums.MaterialType.DIAMOND_ARMOR.contains(mat))
+            enchantability = 10;
         else if (EnchEnums.MaterialType.ENCHANTED_BOOK.contains(mat)) enchantability = 1;
-        else if (EnchEnums.MaterialType.TURTLE_SHELL.contains(mat) || EnchEnums.MaterialType.IRON.contains(mat)) enchantability = 9;
+        else if (EnchEnums.MaterialType.TURTLE_SHELL.contains(mat) || EnchEnums.MaterialType.IRON.contains(mat))
+            enchantability = 9;
         else if (EnchEnums.MaterialType.STONE.contains(mat)) enchantability = 5;
         else if (EnchEnums.MaterialType.CHAIN.contains(mat)) enchantability = 12;
         else if (EnchEnums.MaterialType.IRON_ARMOR.contains(mat)) enchantability = 14;

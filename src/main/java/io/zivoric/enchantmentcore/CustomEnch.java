@@ -1,7 +1,7 @@
 package io.zivoric.enchantmentcore;
 
-import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
 import io.zivoric.enchantmentcore.utils.EnchEnums;
+import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
