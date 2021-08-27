@@ -44,7 +44,7 @@ public class PaperLoreHandler implements LoreHandler {
         }
 
         // Set lore to item meta
-        if (!createdLore.equals(currentLore)) {
+        if (!createdLore.equals(currentLore) && !createdLore.isEmpty()) {
             meta.lore(createdLore);
         }
 
