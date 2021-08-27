@@ -126,7 +126,7 @@ public abstract class CustomEnch extends Enchantment {
     }
 
     void registerEnchantment() {
-        setDisabled(!getDisabledEnchants().isEmpty() && getDisabledEnchants().contains(getName().toLowerCase()));
+        setDisabled(!getDisabledEnchants().isEmpty() && getDisabledEnchants().contains(getKey().toString().toLowerCase()));
         if (!isDisabled() && !byKey.containsKey(super.getKey())) {
             byKey.put(super.getKey(), this);
             byName.put(getName(), this);

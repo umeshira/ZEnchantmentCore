@@ -2,7 +2,7 @@
 # GENERAL OPTIONS #
 # # # # # # # # # #
 
-# Disables any enchantments in the list (applies for all addons), ex. ['life_steal', 'my_enchant']
+# Disables any enchantments in the list, ex. ['zenchantments-basic:life_steal', 'my_plugin:my_enchant']
 disabled-enchantments: []
 
 # # # # # # # # # # #
