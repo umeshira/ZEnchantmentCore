@@ -23,6 +23,12 @@ jobs:
         with:
           name: "ZEnchantmentCore"
           path: "./target/ZEnchantmentCore.jar"
+      - name: Upload artifacts to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "./target/ZEnchantmentCore.jar"
+          tag: ${{ github.ref }}
       - name: Deploy Javadocs
         uses: peaceiris/actions-gh-pages@v3
         with:
