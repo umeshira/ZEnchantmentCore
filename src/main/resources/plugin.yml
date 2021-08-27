@@ -1,5 +1,5 @@
 name: ${project.name}
-main: com.hoodiecoder.enchantmentcore.EnchantmentCore
+main: io.zivoric.enchantmentcore.EnchantmentCore
 version: ${project.version}
 api-version: 1.13
 

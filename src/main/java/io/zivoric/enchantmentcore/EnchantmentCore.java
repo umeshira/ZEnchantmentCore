@@ -126,6 +126,7 @@ public class EnchantmentCore extends JavaPlugin {
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " list" + ChatColor.GRAY + " - lists all enchantments");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " help" + ChatColor.GRAY + " - displays this page");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " check" + ChatColor.GRAY + " - checks enchantments on main hand");
+                        sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " info <enchantment>" + ChatColor.GRAY + " - gets information about a registered enchantment");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " enchant <player> <enchantment> [level]" + ChatColor.GRAY + " - adds enchantment to main hand");
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " reload" + ChatColor.GRAY + " - reloads config and enchantments");
                         sender.sendMessage(ChatColor.GRAY + "More commands will be added soon\u2122!");
