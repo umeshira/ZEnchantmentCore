@@ -3,8 +3,7 @@ package io.zivoric.enchantmentcore.utils.lore;
 import io.zivoric.enchantmentcore.CustomEnch;
 import io.zivoric.enchantmentcore.paper.PaperCustomEnch;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PaperLoreHandler implements LoreHandler {
-    private static final Component ENCH_CODE = Component.text("", Style.style(TextDecoration.OBFUSCATED)).append(Component.text(" ", Style.style(NamedTextColor.GRAY, TextDecoration.OBFUSCATED)));
+    private static final Component ENCH_CODE = Component.empty().color(TextColor.color(0xfa02ff)).append(Component.empty().color(TextColor.color(0x26b8ff)));
 
     @Override
     public Map<CustomEnch, Integer> updateItemLore(ItemMeta meta, Map<CustomEnch, Integer> currentEnchantMap) {
@@ -26,7 +25,7 @@ public class PaperLoreHandler implements LoreHandler {
         currentEnchantMap.forEach((ench, level) -> {
             if (ench instanceof PaperCustomEnch) {
                 if (showEnchants) {
-                    createdLore.add(ench.displayName(level).append(ENCH_CODE));
+                    createdLore.add(ench.displayName(level).decoration(TextDecoration.ITALIC, false).append(ENCH_CODE));
                 }
             } else {
                 remaining.put(ench, level);

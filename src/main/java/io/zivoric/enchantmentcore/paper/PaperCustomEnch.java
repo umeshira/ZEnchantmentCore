@@ -6,7 +6,6 @@ import io.zivoric.enchantmentcore.EnchantmentHolder;
 import io.zivoric.enchantmentcore.utils.EnchEnums.Rarity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.inventory.EquipmentSlot;
@@ -44,7 +43,7 @@ public abstract class PaperCustomEnch extends CustomEnch {
         if (level != 1 || this.getMaxLevel() != 1) {
             component = component.append(Component.space()).append(Component.translatable("enchantment.level." + level));
         }
-        component = component.color(this.isCursed() ? NamedTextColor.RED : NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false);
+        component = component.color(this.isCursed() ? NamedTextColor.RED : NamedTextColor.GRAY);
         return component;
     }
 

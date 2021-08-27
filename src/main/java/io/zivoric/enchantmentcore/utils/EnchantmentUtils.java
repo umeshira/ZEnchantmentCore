@@ -51,7 +51,7 @@ public class EnchantmentUtils {
         }
 
         LORE_HANDLER_LIST.addFirst(new DefaultLoreHandler());
-        if (VersionUtils.BUKKIT_TYPE == BukkitType.PAPER) {
+        if (mcVersion >= 16 && VersionUtils.BUKKIT_TYPE == BukkitType.PAPER) {
             LORE_HANDLER_LIST.addFirst(new PaperLoreHandler());
         }
     }
