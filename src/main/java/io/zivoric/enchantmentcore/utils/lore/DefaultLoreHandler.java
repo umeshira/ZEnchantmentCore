@@ -64,7 +64,7 @@ public class DefaultLoreHandler implements LoreHandler {
         }
 
         // Set lore to item meta
-        if (!createdLore.equals(currentLore) && !createdLore.isEmpty()) {
+        if (!createdLore.equals(currentLore)) {
             meta.setLore(createdLore);
         }
 
