@@ -50,10 +50,10 @@ public class EnchantmentUtils {
             VERY_RARE = Arrays.asList(Enchantment.THORNS, Enchantment.BINDING_CURSE, Enchantment.SILK_TOUCH, Enchantment.ARROW_INFINITE, Enchantment.CHANNELING, Enchantment.VANISHING_CURSE);
         }
 
-        LORE_HANDLER_LIST.addFirst(new DefaultLoreHandler());
         if (VersionUtils.BUKKIT_TYPE == BukkitType.PAPER) {
             LORE_HANDLER_LIST.addFirst(new PaperLoreHandler());
         }
+        LORE_HANDLER_LIST.addFirst(new DefaultLoreHandler());
     }
 
     /**
