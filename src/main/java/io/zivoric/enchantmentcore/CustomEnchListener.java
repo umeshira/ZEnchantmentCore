@@ -88,6 +88,10 @@ public class CustomEnchListener implements Listener {
             LivingEntity entity = (LivingEntity) event.getHitEntity();
             executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onHit(entity, levels, itemStacks, event));
         }
+        if (event.getEntity().getShooter() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity().getShooter();
+            executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onTargetHit(entity, levels, itemStacks, event));
+        }
     }
 
     @EventHandler
