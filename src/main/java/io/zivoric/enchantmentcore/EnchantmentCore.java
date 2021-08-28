@@ -151,7 +151,7 @@ public class EnchantmentCore extends JavaPlugin {
                                     } else {
                                         levelRange = DefaultLoreHandler.getRomanNumeral(1) + "-" + DefaultLoreHandler.getRomanNumeral(ce.getMaxLevel());
                                     }
-                                    sender.sendMessage(ChatColor.GRAY + " - " + chatColor + ce.getName().toLowerCase() + ", " + ce.getDisplayName() + " " + levelRange);
+                                    sender.sendMessage(ChatColor.GRAY + " - " + chatColor + ce.getKey() + ", " + ce.getDisplayName() + " " + levelRange);
                                 }
                                 break;
                             } else {
