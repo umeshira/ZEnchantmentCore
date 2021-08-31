@@ -258,20 +258,20 @@ public class EnchantmentUtils {
     public static Map<Enchantment, Integer> combineEnchants(ItemStack itemToEnchant, boolean allowIllegal, Map<Enchantment, Integer>... maps) {
         Map<Enchantment, Integer> combined = new HashMap<>();
         for (Map<Enchantment, Integer> map : maps) {
-            initialEntryLoop:
-            for (Entry<Enchantment, Integer> entry : map.entrySet()) {
+            map.forEach((enchant, level) -> {
                 for (Entry<Enchantment, Integer> combinedEntry : combined.entrySet()) {
-                    if (!allowIllegal && combinedEntry.getKey().conflictsWith(entry.getKey()))
-                        continue initialEntryLoop;
+                    if (!allowIllegal && combinedEntry.getKey().conflictsWith(enchant))
+                        return;
                 }
-                if (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && (!allowIllegal && !entry.getKey().canEnchantItem(itemToEnchant)))
-                    continue initialEntryLoop;
-                else if (!combined.containsKey(entry.getKey()) || combined.get(entry.getKey()) < entry.getValue()) {
-                    combined.put(entry.getKey(), entry.getValue());
-                } else if (combined.get(entry.getKey()).equals(entry.getValue()) && entry.getValue() < entry.getKey().getMaxLevel()) {
-                    combined.put(entry.getKey(), entry.getValue() + 1);
+                if (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && (!allowIllegal && !enchant.canEnchantItem(itemToEnchant))) {
+                    return;
                 }
-            }
+                if (!combined.containsKey(enchant) || combined.get(enchant) < level) {
+                    combined.put(enchant, level);
+                } else if (combined.get(enchant).equals(level) && level < enchant.getMaxLevel()) {
+                    combined.put(enchant, level + 1);
+                }
+            });
         }
         return combined;
     }
@@ -287,16 +287,15 @@ public class EnchantmentUtils {
      */
     public static Map<Enchantment, Integer> getValidSacrificeEnchants(ItemStack itemToEnchant, boolean allowIllegal, Map<Enchantment, Integer> target, Map<Enchantment, Integer> sacrifice) {
         Map<Enchantment, Integer> result = new HashMap<>();
-        sacrificeLoop:
-        for (Entry<Enchantment, Integer> sacrificeEntry : sacrifice.entrySet()) {
-            if (!allowIllegal && (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !sacrificeEntry.getKey().canEnchantItem(itemToEnchant)))
-                continue sacrificeLoop;
+        sacrifice.forEach((enchant, level) -> {
+            if (!allowIllegal && (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !enchant.canEnchantItem(itemToEnchant)))
+                return;
             for (Entry<Enchantment, Integer> targetEntry : target.entrySet()) {
-                if (!allowIllegal && (targetEntry.getKey().conflictsWith(sacrificeEntry.getKey())))
-                    continue sacrificeLoop;
+                if (!allowIllegal && targetEntry.getKey().conflictsWith(enchant))
+                    return;
             }
-            result.put(sacrificeEntry.getKey(), sacrificeEntry.getValue());
-        }
+            result.put(enchant, level);
+        });
         return result;
     }
 
