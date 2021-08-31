@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Utility class containing several useful methods for using the plugin, as well as manipulating and working with enchantments.
@@ -516,22 +517,17 @@ public class EnchantmentUtils {
      * @param <T>                    the type of the handler
      */
     private static <T> void executeEnchantEvent(Function<CustomEnch, ItemStack[]> applicableItemSupplier, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
-        Arrays.stream(CustomEnch.values()).forEach(customEnch -> {
+        for (CustomEnch customEnch : CustomEnch.values()) {
             if (!handlerClass.isInstance(customEnch)) {
-                return;
+                continue;
             }
             T handler = handlerClass.cast(customEnch);
             ItemStack[] applicableItems = applicableItemSupplier.apply(customEnch);
-            if (applicableItems.length <= 0) {
-                return;
+            if (applicableItems.length > 0) {
+                List<ItemStack> items = Arrays.asList(applicableItems);
+                List<Integer> levels = items.stream().map(item -> item.getItemMeta().getEnchantLevel(customEnch)).collect(Collectors.toList());
+                handlerConsumer.accept(handler, levels, items);
             }
-            List<Integer> levels = new ArrayList<>();
-            List<ItemStack> items = new ArrayList<>();
-            for (ItemStack o : applicableItems) {
-                items.add(o);
-                levels.add(o.getItemMeta().getEnchantLevel(customEnch));
-            }
-            handlerConsumer.accept(handler, levels, items);
-        });
+        }
     }
 }
