@@ -1,18 +1,13 @@
 package io.zivoric.enchantmentcore;
 
 import io.zivoric.enchantmentcore.enchant.*;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static io.zivoric.enchantmentcore.utils.EnchantmentUtils.executeEnchantEvent;
 
 /**
  * Event listener responsible for sending events to custom enchantments for handling.
@@ -26,94 +21,6 @@ public class CustomEnchListener implements Listener {
     public CustomEnchListener(Plugin implementer) {
         this.implementer = implementer;
         console = implementer.getServer().getConsoleSender();
-    }
-
-    public static <T> void executeEnchantEvent(LivingEntity livingEntity, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
-        EntityEquipment entityEquipment = livingEntity.getEquipment();
-        Arrays.stream(CustomEnch.values()).forEach(customEnch -> {
-            if (!handlerClass.isInstance(customEnch)) {
-                return;
-            }
-            T handler = handlerClass.cast(customEnch);
-            ItemStack[] applicableItems = getApplicableItems(customEnch, entityEquipment);
-            if (applicableItems.length <= 0) {
-                return;
-            }
-            List<Integer> levels = new ArrayList<>();
-            List<ItemStack> items = new ArrayList<>();
-            for (ItemStack o : applicableItems) {
-                items.add(o);
-                levels.add(o.getItemMeta().getEnchantLevel(customEnch));
-            }
-            handlerConsumer.accept(handler, levels, items);
-        });
-    }
-
-    private static ItemStack[] getApplicableItems(CustomEnch ench, EntityEquipment entityEquipment) {
-        ItemStack[] applicableItems = new ItemStack[0];
-        if (ench.isDisabled()) return applicableItems;
-        switch (ench.getItemTarget()) {
-            case ARMOR_FEET:
-                ItemStack feet = entityEquipment.getBoots();
-                if (feet != null && feet.getItemMeta() != null && ench.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(ench)) {
-                    applicableItems = new ItemStack[]{feet};
-                }
-                break;
-            case ARMOR_HEAD:
-                ItemStack head = entityEquipment.getHelmet();
-                if (head != null && head.getItemMeta() != null && ench.canEnchantItem(head) && head.getItemMeta().hasEnchant(ench)) {
-                    applicableItems = new ItemStack[]{head};
-                }
-                break;
-            case ARMOR_LEGS:
-                ItemStack legs = entityEquipment.getLeggings();
-                if (legs != null && legs.getItemMeta() != null && ench.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(ench)) {
-                    applicableItems = new ItemStack[]{legs};
-                }
-                break;
-            case ARMOR_TORSO:
-                ItemStack chest = entityEquipment.getChestplate();
-                if (chest != null && chest.getItemMeta() != null && ench.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(ench)) {
-                    applicableItems = new ItemStack[]{chest};
-                }
-                break;
-            case ARMOR:
-            case WEARABLE:
-                ItemStack[] armorArr = entityEquipment.getArmorContents();
-                List<ItemStack> armor = new ArrayList<>();
-                for (ItemStack a : armorArr) {
-                    if (a != null && a.getItemMeta() != null && a.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(a)) {
-                        armor.add(a);
-                    }
-                }
-                if (!armor.isEmpty()) {
-                    applicableItems = armor.toArray(new ItemStack[0]);
-                }
-                break;
-            case BOW:
-            case CROSSBOW:
-            case FISHING_ROD:
-            case TOOL:
-            case TRIDENT:
-            case WEAPON:
-            case BREAKABLE:
-                List<ItemStack> itemS = new ArrayList<>();
-                ItemStack itemMain = entityEquipment.getItemInMainHand();
-                ItemStack itemOff = entityEquipment.getItemInOffHand();
-                if (itemMain.getItemMeta() != null && itemMain.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemMain)) {
-                    itemS.add(itemMain);
-                }
-                if (itemOff.getItemMeta() != null && itemOff.getItemMeta().hasEnchant(ench) && ench.canEnchantItem(itemOff)) {
-                    itemS.add(itemOff);
-                }
-                if (!itemS.isEmpty()) {
-                    applicableItems = itemS.toArray(new ItemStack[0]);
-                }
-                break;
-            default:
-                break;
-        }
-        return applicableItems;
     }
 
     @EventHandler
@@ -180,6 +87,10 @@ public class CustomEnchListener implements Listener {
         if (event.getHitEntity() instanceof LivingEntity) {
             LivingEntity entity = (LivingEntity) event.getHitEntity();
             executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onHit(entity, levels, itemStacks, event));
+        }
+        if (event.getEntity().getShooter() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getEntity().getShooter();
+            executeEnchantEvent(entity, ProjectileHandler.class, (handler, levels, itemStacks) -> handler.onTargetHit(entity, levels, itemStacks, event));
         }
     }
 

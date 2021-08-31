@@ -6,9 +6,12 @@ import io.zivoric.enchantmentcore.EnchantmentGenerator;
 import io.zivoric.enchantmentcore.utils.lore.DefaultLoreHandler;
 import io.zivoric.enchantmentcore.utils.lore.LoreHandler;
 import io.zivoric.enchantmentcore.utils.lore.PaperLoreHandler;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -16,6 +19,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Utility class containing several useful methods for using the plugin, as well as manipulating and working with enchantments.
@@ -253,20 +258,20 @@ public class EnchantmentUtils {
     public static Map<Enchantment, Integer> combineEnchants(ItemStack itemToEnchant, boolean allowIllegal, Map<Enchantment, Integer>... maps) {
         Map<Enchantment, Integer> combined = new HashMap<>();
         for (Map<Enchantment, Integer> map : maps) {
-            initialEntryLoop:
-            for (Entry<Enchantment, Integer> entry : map.entrySet()) {
+            map.forEach((enchant, level) -> {
                 for (Entry<Enchantment, Integer> combinedEntry : combined.entrySet()) {
-                    if (!allowIllegal && combinedEntry.getKey().conflictsWith(entry.getKey()))
-                        continue initialEntryLoop;
+                    if (!allowIllegal && combinedEntry.getKey().conflictsWith(enchant))
+                        return;
                 }
-                if (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && (!allowIllegal && !entry.getKey().canEnchantItem(itemToEnchant)))
-                    continue initialEntryLoop;
-                else if (!combined.containsKey(entry.getKey()) || combined.get(entry.getKey()) < entry.getValue()) {
-                    combined.put(entry.getKey(), entry.getValue());
-                } else if (combined.get(entry.getKey()).equals(entry.getValue()) && entry.getValue() < entry.getKey().getMaxLevel()) {
-                    combined.put(entry.getKey(), entry.getValue() + 1);
+                if (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && (!allowIllegal && !enchant.canEnchantItem(itemToEnchant))) {
+                    return;
                 }
-            }
+                if (!combined.containsKey(enchant) || combined.get(enchant) < level) {
+                    combined.put(enchant, level);
+                } else if (combined.get(enchant).equals(level) && level < enchant.getMaxLevel()) {
+                    combined.put(enchant, level + 1);
+                }
+            });
         }
         return combined;
     }
@@ -282,16 +287,15 @@ public class EnchantmentUtils {
      */
     public static Map<Enchantment, Integer> getValidSacrificeEnchants(ItemStack itemToEnchant, boolean allowIllegal, Map<Enchantment, Integer> target, Map<Enchantment, Integer> sacrifice) {
         Map<Enchantment, Integer> result = new HashMap<>();
-        sacrificeLoop:
-        for (Entry<Enchantment, Integer> sacrificeEntry : sacrifice.entrySet()) {
-            if (!allowIllegal && (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !sacrificeEntry.getKey().canEnchantItem(itemToEnchant)))
-                continue sacrificeLoop;
+        sacrifice.forEach((enchant, level) -> {
+            if (!allowIllegal && (!(itemToEnchant.getItemMeta() instanceof EnchantmentStorageMeta) && !enchant.canEnchantItem(itemToEnchant)))
+                return;
             for (Entry<Enchantment, Integer> targetEntry : target.entrySet()) {
-                if (!allowIllegal && (targetEntry.getKey().conflictsWith(sacrificeEntry.getKey())))
-                    continue sacrificeLoop;
+                if (!allowIllegal && targetEntry.getKey().conflictsWith(enchant))
+                    return;
             }
-            result.put(sacrificeEntry.getKey(), sacrificeEntry.getValue());
-        }
+            result.put(enchant, level);
+        });
         return result;
     }
 
@@ -400,5 +404,129 @@ public class EnchantmentUtils {
      */
     public static ConfigurationSection generatorSettings() {
         return EnchantmentCore.getInstance().getConfig().getConfigurationSection("enchantment-generator");
+    }
+
+    /**
+     * Execute the enchantment event handler from the equipment of the entity
+     *
+     * @param livingEntity    the entity
+     * @param handlerClass    the handler class
+     * @param handlerConsumer the consumer contains an instance of the handler, a list of levels and a list of applicable items
+     * @param <T>             the type of the handler
+     */
+    public static <T> void executeEnchantEvent(LivingEntity livingEntity, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
+        EntityEquipment entityEquipment = livingEntity.getEquipment();
+        if (entityEquipment == null) {
+            return;
+        }
+        executeEnchantEvent(customEnch -> {
+            ItemStack[] applicableItems = new ItemStack[0];
+            if (customEnch.isDisabled()) return applicableItems;
+            switch (customEnch.getItemTarget()) {
+                case ARMOR_FEET:
+                    ItemStack feet = entityEquipment.getBoots();
+                    if (feet != null && feet.getItemMeta() != null && customEnch.canEnchantItem(feet) && feet.getItemMeta().hasEnchant(customEnch)) {
+                        applicableItems = new ItemStack[]{feet};
+                    }
+                    break;
+                case ARMOR_HEAD:
+                    ItemStack head = entityEquipment.getHelmet();
+                    if (head != null && head.getItemMeta() != null && customEnch.canEnchantItem(head) && head.getItemMeta().hasEnchant(customEnch)) {
+                        applicableItems = new ItemStack[]{head};
+                    }
+                    break;
+                case ARMOR_LEGS:
+                    ItemStack legs = entityEquipment.getLeggings();
+                    if (legs != null && legs.getItemMeta() != null && customEnch.canEnchantItem(legs) && legs.getItemMeta().hasEnchant(customEnch)) {
+                        applicableItems = new ItemStack[]{legs};
+                    }
+                    break;
+                case ARMOR_TORSO:
+                    ItemStack chest = entityEquipment.getChestplate();
+                    if (chest != null && chest.getItemMeta() != null && customEnch.canEnchantItem(chest) && chest.getItemMeta().hasEnchant(customEnch)) {
+                        applicableItems = new ItemStack[]{chest};
+                    }
+                    break;
+                case ARMOR:
+                case WEARABLE:
+                    ItemStack[] armorArr = entityEquipment.getArmorContents();
+                    List<ItemStack> armor = new ArrayList<>();
+                    for (ItemStack a : armorArr) {
+                        if (a != null && a.getItemMeta() != null && a.getItemMeta().hasEnchant(customEnch) && customEnch.canEnchantItem(a)) {
+                            armor.add(a);
+                        }
+                    }
+                    if (!armor.isEmpty()) {
+                        applicableItems = armor.toArray(new ItemStack[0]);
+                    }
+                    break;
+                case BOW:
+                case CROSSBOW:
+                case FISHING_ROD:
+                case TOOL:
+                case TRIDENT:
+                case WEAPON:
+                case BREAKABLE:
+                    List<ItemStack> itemS = new ArrayList<>();
+                    ItemStack itemMain = entityEquipment.getItemInMainHand();
+                    ItemStack itemOff = entityEquipment.getItemInOffHand();
+                    if (itemMain.getItemMeta() != null && itemMain.getItemMeta().hasEnchant(customEnch) && customEnch.canEnchantItem(itemMain)) {
+                        itemS.add(itemMain);
+                    }
+                    if (itemOff.getItemMeta() != null && itemOff.getItemMeta().hasEnchant(customEnch) && customEnch.canEnchantItem(itemOff)) {
+                        itemS.add(itemOff);
+                    }
+                    if (!itemS.isEmpty()) {
+                        applicableItems = itemS.toArray(new ItemStack[0]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return applicableItems;
+        }, handlerClass, handlerConsumer);
+    }
+
+    /**
+     * Execute the enchantment event handler, given a list of the enchanted items
+     *
+     * @param itemStacks      the list of the items
+     * @param handlerClass    the handler class
+     * @param handlerConsumer the consumer contains an instance of the handler, a list of levels and a list of applicable items
+     * @param <T>             the type of the handler
+     */
+    public static <T> void executeEnchantEvent(List<ItemStack> itemStacks, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
+        executeEnchantEvent(
+                customEnch -> itemStacks.stream()
+                        .filter(Objects::nonNull)
+                        .filter(itemStack -> itemStack.getItemMeta() != null)
+                        .filter(customEnch::canEnchantItem)
+                        .filter(itemStack -> itemStack.getItemMeta().hasEnchant(customEnch))
+                        .toArray(ItemStack[]::new),
+                handlerClass, handlerConsumer
+        );
+    }
+
+    /**
+     * Execute the enchantment event handler, given the applicable item supplier
+     *
+     * @param applicableItemSupplier the applicable item supplier
+     * @param handlerClass           the handler class
+     * @param handlerConsumer        the consumer contains an instance of the handler, a list of levels and a list of applicable items
+     * @param <T>                    the type of the handler
+     */
+    private static <T> void executeEnchantEvent(Function<CustomEnch, ItemStack[]> applicableItemSupplier, Class<T> handlerClass, TriConsumer<T, List<Integer>, List<ItemStack>> handlerConsumer) {
+        for (CustomEnch customEnch : CustomEnch.values()) {
+            if (!handlerClass.isInstance(customEnch)) {
+                continue;
+            }
+            T handler = handlerClass.cast(customEnch);
+            ItemStack[] applicableItems = applicableItemSupplier.apply(customEnch);
+            if (applicableItems.length > 0) {
+                List<ItemStack> items = Arrays.asList(applicableItems);
+                List<Integer> levels = items.stream().map(item -> item.getItemMeta().getEnchantLevel(customEnch)).collect(Collectors.toList());
+                handlerConsumer.accept(handler, levels, items);
+            }
+        }
     }
 }
