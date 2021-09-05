@@ -30,16 +30,11 @@ import java.util.Map.Entry;
  */
 public class EnchantmentGenerator {
     private final Random r = new Random();
-    private final int randomModifier;
 
     /**
      * Creates a new <code>EnchantmentGenerator</code>.
      */
     public EnchantmentGenerator() {
-        if (VersionUtils.SERVER_VERSION >= 14)
-            randomModifier = 0;
-        else
-            randomModifier = r.nextInt();
     }
 
     /**
@@ -207,7 +202,7 @@ public class EnchantmentGenerator {
             enchantability = 15;
         else if (EnchEnums.MaterialType.DIAMOND.contains(mat) || EnchEnums.MaterialType.DIAMOND_ARMOR.contains(mat))
             enchantability = 10;
-        else if (EnchEnums.MaterialType.ENCHANTED_BOOK.contains(mat)) enchantability = 1;
+        // else if (EnchEnums.MaterialType.ENCHANTED_BOOK.contains(mat)) enchantability = 1;
         else if (EnchEnums.MaterialType.TURTLE_SHELL.contains(mat) || EnchEnums.MaterialType.IRON.contains(mat))
             enchantability = 9;
         else if (EnchEnums.MaterialType.STONE.contains(mat)) enchantability = 5;
@@ -330,6 +325,11 @@ public class EnchantmentGenerator {
         return bonus;
     }
 
+    /**
+     * Gets this custom generator's enchanting seed for the player.
+     * @param enchanter The player
+     * @return The enchantment seed for the player
+     */
     public int getXpSeed(Player enchanter) {
         PersistentDataContainer container = enchanter.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(EnchantmentCore.getInstance(), "xp_seed");
@@ -340,12 +340,22 @@ public class EnchantmentGenerator {
         }
     }
 
+    /**
+     * Sets a given player's enchanting seed to a new random value.
+     * @param   enchanter The player
+     * @return  The updated seed
+     */
     public int updateXpSeed(Player enchanter) {
         int random = r.nextInt();
         setXpSeed(enchanter, random);
         return random;
     }
 
+    /**
+     * Sets a given player's enchanting seed to the specified value.
+     * @param enchanter The player
+     * @param seed      The seed to set to
+     */
     public void setXpSeed(Player enchanter, int seed) {
         NamespacedKey key = new NamespacedKey(EnchantmentCore.getInstance(), "xp_seed");
         enchanter.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, seed);
