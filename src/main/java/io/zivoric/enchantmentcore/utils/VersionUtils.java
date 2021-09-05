@@ -3,7 +3,7 @@ package io.zivoric.enchantmentcore.utils;
 import org.bukkit.Bukkit;
 
 /**
- * Utility class on server version
+ * Utility class for server version information
  */
 public class VersionUtils {
     /**

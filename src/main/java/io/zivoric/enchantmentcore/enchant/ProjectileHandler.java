@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ProjectileHandler {
     /**
-     * <p>Event method automatically called when an entity using this enchantment hits something.</p>
+     * <p>Event method automatically called when an entity using this enchantment is hit by a projectile.</p>
      *
      * @param entity The entity involved
      * @param levels The levels of each item currently in use with this enchantment
@@ -22,7 +22,7 @@ public interface ProjectileHandler {
     void onHit(LivingEntity entity, List<Integer> levels, List<ItemStack> items, ProjectileHitEvent event);
 
     /**
-     * <p>Event method automatically called when an entity using this enchantment have its target hit by the entity's projectile.</p>
+     * <p>Event method automatically called when an entity using this enchantment hits something with a projectile.</p>
      *
      * @param entity The entity involved
      * @param levels The levels of each item currently in use with this enchantment
