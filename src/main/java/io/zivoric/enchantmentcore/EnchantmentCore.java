@@ -336,7 +336,7 @@ public class EnchantmentCore extends JavaPlugin {
     private void keyCompletions(String arg, List<NamespacedKey> keys, List<String> completions) {
         arg = arg.toLowerCase();
         for (NamespacedKey key : keys) {
-            if (key.getNamespace().startsWith(arg) || key.getKey().startsWith(arg))
+            if (key.toString().startsWith(arg) || key.getKey().startsWith(arg))
                 completions.add(key.toString());
         }
     }
