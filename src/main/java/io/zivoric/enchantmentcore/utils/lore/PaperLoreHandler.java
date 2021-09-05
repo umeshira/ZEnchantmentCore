@@ -3,8 +3,10 @@ package io.zivoric.enchantmentcore.utils.lore;
 import io.zivoric.enchantmentcore.CustomEnch;
 import io.zivoric.enchantmentcore.paper.PaperCustomEnch;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -13,8 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The {@link LoreHandler} that works on Paper-specific enchantments
+ */
 public class PaperLoreHandler implements LoreHandler {
-    private static final Component ENCH_CODE = Component.empty().color(TextColor.color(0xfa02ff)).append(Component.empty().color(TextColor.color(0x26b8ff)));
+    private static final Component ENCH_CODE = Component.empty().style(Style.style().color(TextColor.color(0x7a6563))
+            .decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, false)
+            .decoration(TextDecoration.BOLD, false).decoration(TextDecoration.STRIKETHROUGH, false)
+            .decoration(TextDecoration.UNDERLINED, false));
 
     @Override
     public Map<CustomEnch, Integer> updateItemLore(ItemMeta meta, Map<CustomEnch, Integer> currentEnchantMap) {
@@ -36,7 +44,7 @@ public class PaperLoreHandler implements LoreHandler {
         List<Component> currentLore = meta.lore();
         if (currentLore != null) {
             for (Component comp : currentLore) {
-                if (!comp.contains(ENCH_CODE, Component.EQUALS)) { // Should not contain enchant lore
+                if (!comp.children().contains(ENCH_CODE)) { // Should not contain enchant lore
                     createdLore.add(comp);
                 }
             }
