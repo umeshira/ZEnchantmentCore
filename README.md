@@ -15,8 +15,8 @@ There is a sample addon, ZEnchantments-Basic, provided in the Useful Links secti
 
 Source Code - https://github.com/zivoric/ZEnchantmentCore
 
-Javadocs - https://zivoric.github.io/ZEnchantmentCore/
+Javadocs - https://zivoric.github.io/ZEnchantmentCore
 
-Wiki - **Currently disabled**
+Wiki - https://github.com/zivoric/ZEnchantmentCore/wiki
 
 Example Enchantment Addon - https://github.com/zivoric/ZEnchantments-Basic
