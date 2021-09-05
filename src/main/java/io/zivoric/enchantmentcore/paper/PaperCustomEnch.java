@@ -40,10 +40,12 @@ public abstract class PaperCustomEnch extends CustomEnch {
     @Override
     public final @NotNull Component displayName(int level) {
         Component component = displayName();
+        NamedTextColor color = this.isCursed() ? NamedTextColor.RED : NamedTextColor.GRAY;
         if (level != 1 || this.getMaxLevel() != 1) {
-            component = component.append(Component.space()).append(Component.translatable("enchantment.level." + level));
+            Component levelComp = Component.translatable("enchantment.level." + level).color(color);
+            component = component.append(Component.space()).append(levelComp);
         }
-        component = component.color(this.isCursed() ? NamedTextColor.RED : NamedTextColor.GRAY);
+        component = component.color(color);
         return component;
     }
 
