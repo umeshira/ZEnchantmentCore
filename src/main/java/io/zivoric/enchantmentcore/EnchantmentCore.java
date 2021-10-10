@@ -386,7 +386,7 @@ public class EnchantmentCore extends JavaPlugin {
         saveResourceConfig();
         config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
         getLogger().info("Custom enchantment generator enabled? " + getConfig().getBoolean("enable-custom-generator"));
-        if (reloading) {
+        if (reloading || getConfig().getBoolean("register-on-enable")) {
             CustomEnch.batchRegister();
         } else {
             BukkitRunnable runnable = new BukkitRunnable() {

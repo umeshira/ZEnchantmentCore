@@ -5,6 +5,10 @@
 # Disables any enchantments in the list, ex. ['zenchantments-basic:life_steal', 'my_plugin:my_enchant']
 disabled-enchantments: [ ]
 
+# Register all enchantments on enable, fix compatibility with other item plugins
+# However, addons that register enchantments on onEnable will not work. Recommend registering on onLoad
+register-on-enable: false
+
 # # # # # # # # # # #
 # GENERATOR OPTIONS #
 # # # # # # # # # # #
