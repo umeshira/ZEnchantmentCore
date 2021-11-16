@@ -12,8 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.StringUtil;
 
-import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -37,7 +34,7 @@ import java.util.stream.Stream;
 public class EnchantmentCore extends JavaPlugin {
     private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
     private static EnchantmentCore instance;
-    private FileConfiguration config;
+    private final CustomEnchListener customEnchListener = new CustomEnchListener(this);
     private EnchantmentGenerator coreGenerator;
     private int enchLimit;
 
@@ -76,10 +73,9 @@ public class EnchantmentCore extends JavaPlugin {
         reloadableEnable(false);
         ItemEnchantListener iel = new ItemEnchantListener(this, coreGenerator);
         AutoEnchListener ael = new AutoEnchListener(this);
-        CustomEnchListener customListener = new CustomEnchListener(this);
         m.registerEvents(iel, this);
         m.registerEvents(ael, this);
-        m.registerEvents(customListener, this);
+        customEnchListener.register();
         if (VersionUtils.SERVER_VERSION >= 15) {
             LootGenerateListener lgl = new LootGenerateListener(coreGenerator);
             m.registerEvents(lgl, this);
@@ -383,8 +379,8 @@ public class EnchantmentCore extends JavaPlugin {
     }
 
     private void reloadableEnable(boolean reloading) {
-        saveResourceConfig();
-        config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+        saveResource("config.yml", false);
+        reloadConfig();
         getLogger().info("Custom enchantment generator enabled? " + getConfig().getBoolean("enable-custom-generator"));
         if (reloading || getConfig().getBoolean("register-on-enable")) {
             CustomEnch.batchRegister();
@@ -418,14 +414,12 @@ public class EnchantmentCore extends JavaPlugin {
         return coreGenerator;
     }
 
-    void saveResourceConfig() {
-        if (!new File(getDataFolder(), "config.yml").exists()) {
-            saveResource("config.yml", false);
-        }
-    }
-
-    @Override
-    public FileConfiguration getConfig() {
-        return config;
+    /**
+     * Get the current {@link CustomEnchListener} object.
+     *
+     * @return The current listener
+     */
+    public CustomEnchListener getCustomEnchListener() {
+        return customEnchListener;
     }
 }

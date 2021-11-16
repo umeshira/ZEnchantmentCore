@@ -9,6 +9,9 @@ disabled-enchantments: [ ]
 # However, addons that register enchantments on onEnable will not work. Recommend registering on onLoad
 register-on-enable: false
 
+# Disable any unwanted event listeners, use to effectively disable enchantments that listen to the event
+disabled-events: [ ]
+
 # # # # # # # # # # #
 # GENERATOR OPTIONS #
 # # # # # # # # # # #
