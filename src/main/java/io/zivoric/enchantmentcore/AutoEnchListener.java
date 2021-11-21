@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -44,6 +45,11 @@ public class AutoEnchListener implements Listener {
         addAllLore(e.getInventory());
     }
 
+    @EventHandler
+    public void onPickup(EntityPickupItemEvent e) {
+        addLoreLoop(e.getItem().getItemStack());
+    }
+
     private void addAllLore(Inventory inv) {
         addLoreLoop(inv.getContents());
         if (VersionUtils.SERVER_VERSION >= 14 && inv.getType() == InventoryType.GRINDSTONE) {
@@ -56,7 +62,7 @@ public class AutoEnchListener implements Listener {
         }
     }
 
-    private void addLoreLoop(ItemStack[] items) {
+    private void addLoreLoop(ItemStack... items) {
         for (ItemStack i : items) {
             if (i == null) continue;
             ItemMeta meta = i.getItemMeta();
