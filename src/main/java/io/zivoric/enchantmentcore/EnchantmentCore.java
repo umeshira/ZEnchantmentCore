@@ -1,5 +1,8 @@
 package io.zivoric.enchantmentcore;
 
+import io.zivoric.enchantmentcore.autoenchlistener.AutoEnchListener;
+import io.zivoric.enchantmentcore.autoenchlistener.ProtocolAutoEnchListener;
+import io.zivoric.enchantmentcore.autoenchlistener.SimpleAutoEnchListener;
 import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
 import io.zivoric.enchantmentcore.utils.UpdateChecker;
 import io.zivoric.enchantmentcore.utils.VersionUtils;
@@ -35,6 +38,7 @@ public class EnchantmentCore extends JavaPlugin {
     private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
     private static EnchantmentCore instance;
     private final CustomEnchListener customEnchListener = new CustomEnchListener(this);
+    private AutoEnchListener autoEnchListener;
     private EnchantmentGenerator coreGenerator;
     private int enchLimit;
 
@@ -45,6 +49,13 @@ public class EnchantmentCore extends JavaPlugin {
      */
     public static EnchantmentCore getInstance() {
         return instance;
+    }
+
+    @Override
+    public void onLoad() {
+        autoEnchListener = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null
+                ? new ProtocolAutoEnchListener(this)
+                : new SimpleAutoEnchListener(this);
     }
 
     @Override
@@ -71,17 +82,16 @@ public class EnchantmentCore extends JavaPlugin {
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
         reloadableEnable(false);
-        ItemEnchantListener iel = new ItemEnchantListener(this, coreGenerator);
-        AutoEnchListener ael = new AutoEnchListener(this);
-        m.registerEvents(iel, this);
-        m.registerEvents(ael, this);
+        ItemEnchantListener itemEnchantListener = new ItemEnchantListener(this, coreGenerator);
+        m.registerEvents(itemEnchantListener, this);
+        autoEnchListener.setup();
         customEnchListener.register();
         if (VersionUtils.SERVER_VERSION >= 15) {
-            LootGenerateListener lgl = new LootGenerateListener(coreGenerator);
-            m.registerEvents(lgl, this);
+            LootGenerateListener lootGenerateListener = new LootGenerateListener(coreGenerator);
+            m.registerEvents(lootGenerateListener, this);
         } else {
-            LegacyLootGenerateListener lgl = new LegacyLootGenerateListener(coreGenerator);
-            m.registerEvents(lgl, this);
+            LegacyLootGenerateListener legacyLootGenerateListener = new LegacyLootGenerateListener(coreGenerator);
+            m.registerEvents(legacyLootGenerateListener, this);
         }
         new UpdateChecker(this, 88310).getVersion(version -> {
             if (!this.getDescription().getVersion().equalsIgnoreCase(version.substring(1))) {
@@ -375,6 +385,7 @@ public class EnchantmentCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        autoEnchListener.unregister();
         reloadableDisable(false);
     }
 
