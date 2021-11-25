@@ -20,7 +20,9 @@ public interface DamageHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the entity is involved with
      */
-    void onTakeDamage(LivingEntity entity, List<Integer> levels, List<ItemStack> items, EntityDamageEvent event);
+    default void onTakeDamage(LivingEntity entity, List<Integer> levels, List<ItemStack> items, EntityDamageEvent event) {
+        // EMPTY
+    }
 
     /**
      * <p>Event method automatically called when an entity using this enchantment deals damage.</p>
@@ -30,5 +32,7 @@ public interface DamageHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the entity is involved with
      */
-    void onDealDamage(LivingEntity entity, List<Integer> levels, List<ItemStack> items, EntityDamageByEntityEvent event);
+    default void onDealDamage(LivingEntity entity, List<Integer> levels, List<ItemStack> items, EntityDamageByEntityEvent event) {
+        // EMPTY
+    }
 }

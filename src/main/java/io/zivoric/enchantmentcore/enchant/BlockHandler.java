@@ -20,7 +20,9 @@ public interface BlockHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the player is involved with
      */
-    void onPlaceBlock(Player player, List<Integer> levels, List<ItemStack> items, BlockPlaceEvent event);
+    default void onPlaceBlock(Player player, List<Integer> levels, List<ItemStack> items, BlockPlaceEvent event) {
+        // EMPTY
+    }
 
     /**
      * <p>Event method automatically called when a player using this enchantment breaks a block.</p>
@@ -30,5 +32,7 @@ public interface BlockHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the player is involved with
      */
-    void onBreakBlock(Player player, List<Integer> levels, List<ItemStack> items, BlockBreakEvent event);
+    default void onBreakBlock(Player player, List<Integer> levels, List<ItemStack> items, BlockBreakEvent event) {
+        // EMPTY
+    }
 }
