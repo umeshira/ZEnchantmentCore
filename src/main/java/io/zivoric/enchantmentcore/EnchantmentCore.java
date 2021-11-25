@@ -78,14 +78,20 @@ public class EnchantmentCore extends JavaPlugin {
                 m.disablePlugin(this);
                 return;
         }
+
         getLogger().info("Running ZEnchantmentCore on environment " + VersionUtils.BUKKIT_TYPE + " 1." + VersionUtils.SERVER_VERSION);
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
         reloadableEnable(false);
+
         ItemEnchantListener itemEnchantListener = new ItemEnchantListener(this, coreGenerator);
         m.registerEvents(itemEnchantListener, this);
+
+        getLogger().info("Use " + autoEnchListener.getClass().getSimpleName());
         autoEnchListener.setup();
+
         customEnchListener.register();
+
         if (VersionUtils.SERVER_VERSION >= 15) {
             LootGenerateListener lootGenerateListener = new LootGenerateListener(coreGenerator);
             m.registerEvents(lootGenerateListener, this);
@@ -93,6 +99,7 @@ public class EnchantmentCore extends JavaPlugin {
             LegacyLootGenerateListener legacyLootGenerateListener = new LegacyLootGenerateListener(coreGenerator);
             m.registerEvents(legacyLootGenerateListener, this);
         }
+
         new UpdateChecker(this, 88310).getVersion(version -> {
             if (!this.getDescription().getVersion().equalsIgnoreCase(version.substring(1))) {
                 String str = messagePrefix + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";
