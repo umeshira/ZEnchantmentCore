@@ -31,12 +31,16 @@ public abstract class AutoEnchListener {
 
     public abstract void unregister();
 
+    protected final void addLore(ItemStack item) {
+        if (item == null) return;
+        ItemMeta meta = item.getItemMeta();
+        EnchantmentUtils.updateItemLore(meta);
+        item.setItemMeta(meta);
+    }
+
     protected final void addLoreLoop(Collection<ItemStack> items) {
         for (ItemStack i : items) {
-            if (i == null) continue;
-            ItemMeta meta = i.getItemMeta();
-            EnchantmentUtils.updateItemLore(meta);
-            i.setItemMeta(meta);
+            addLore(i);
         }
     }
 

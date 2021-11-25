@@ -27,7 +27,7 @@ public class ProtocolAutoEnchListener extends AutoEnchListener {
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 ItemStack item = packet.getItemModifier().read(0);
-                addLoreLoop(item);
+                addLore(item);
                 packet.getItemModifier().write(0, item);
             }
         });

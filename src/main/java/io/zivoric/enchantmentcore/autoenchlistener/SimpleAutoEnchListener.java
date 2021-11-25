@@ -51,6 +51,6 @@ public class SimpleAutoEnchListener extends AutoEnchListener implements Listener
 
     @EventHandler
     public void onPickup(EntityPickupItemEvent e) {
-        addLoreLoop(e.getItem().getItemStack());
+        addLore(e.getItem().getItemStack());
     }
 }
