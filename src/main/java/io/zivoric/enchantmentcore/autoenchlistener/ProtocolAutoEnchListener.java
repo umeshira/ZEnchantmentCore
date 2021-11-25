@@ -27,9 +27,8 @@ public class ProtocolAutoEnchListener extends AutoEnchListener {
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 ItemStack item = packet.getItemModifier().read(0);
-                ItemStack clone = item.clone();
-                addLoreLoop(clone);
-                packet.getItemModifier().write(0, clone);
+                addLoreLoop(item);
+                packet.getItemModifier().write(0, item);
             }
         });
 
@@ -38,7 +37,6 @@ public class ProtocolAutoEnchListener extends AutoEnchListener {
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                items.replaceAll(ItemStack::clone);
                 addLoreLoop(items);
                 packet.getItemListModifier().write(0, items);
             }
