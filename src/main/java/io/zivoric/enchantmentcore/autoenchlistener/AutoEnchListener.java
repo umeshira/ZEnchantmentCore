@@ -39,9 +39,7 @@ public abstract class AutoEnchListener {
     }
 
     protected final void addLoreLoop(Collection<ItemStack> items) {
-        for (ItemStack i : items) {
-            addLore(i);
-        }
+        items.forEach(this::addLore);
     }
 
     protected final void addLoreLoop(ItemStack... items) {
