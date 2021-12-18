@@ -43,7 +43,7 @@ public class PaperLoreHandler implements LoreHandler {
         List<Component> currentLore = meta.lore();
         if (currentLore != null) {
             for (Component comp : currentLore) {
-                if (!comp.contains(ENCH_CODE)) { // Should not contain enchant lore
+                if (!comp.contains(ENCH_CODE, Component.EQUALS)) { // Should not contain enchant lore
                     createdLore.add(comp);
                 }
             }
