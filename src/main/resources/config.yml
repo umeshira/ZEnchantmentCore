@@ -34,3 +34,5 @@ enchantment-generator:
   allow-survival-illegal-enchants: false
   # Allows the player to apply illegal enchantments using anvils in creative mode
   allow-creative-illegal-enchants: true
+  # Allows the player to apply over-sized (over the max level) enchantments using anvils
+  allow-over-max-level: false
