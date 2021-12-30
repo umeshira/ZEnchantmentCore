@@ -135,7 +135,7 @@ public class ItemEnchantListener implements Listener {
                     repair += (secondMeta instanceof EnchantmentStorageMeta ? EnchantmentUtils.getAnvilBookMultiplier(e.getKey()) : EnchantmentUtils.getAnvilItemMultiplier(e.getKey())) * combinedEnchs.get(e.getKey());
                 if (!combinedEnchs.equals(firstEnchantments) && validSacEnchants.size() != 0) {
                     EnchantmentUtils.removeAllEnchantments(firstMeta);
-                    EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, false);
+                    EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, EnchantmentUtils.generatorSettings().getBoolean("ignore-level-restrictions"));
                     EnchantmentUtils.updateItemLore(firstMeta);
                     canApply = true;
                 }

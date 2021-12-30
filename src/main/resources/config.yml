@@ -36,3 +36,5 @@ enchantment-generator:
   allow-creative-illegal-enchants: true
   # Allows the player to apply over-sized (over the max level) enchantments using anvils
   allow-over-max-level: false
+  # Ignore level restrictions when applying enchantments
+  ignore-level-restrictions: false
