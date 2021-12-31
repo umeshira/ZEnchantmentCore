@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
  * Main plugin class for ZEnchantmentCore.
  */
 public class EnchantmentCore extends JavaPlugin {
-    private static final String messagePrefix = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
+    private static final String PREFIX = ChatColor.DARK_AQUA + "ZEnchantment \u00BB " + ChatColor.GRAY;
     private static EnchantmentCore instance;
     private final CustomEnchListener customEnchListener = new CustomEnchListener(this);
     private AutoEnchListener autoEnchListener;
@@ -82,7 +81,8 @@ public class EnchantmentCore extends JavaPlugin {
         getLogger().info("Running ZEnchantmentCore on environment " + VersionUtils.BUKKIT_TYPE + " 1." + VersionUtils.SERVER_VERSION);
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
-        reloadableEnable(false);
+        CustomEnch.loadEnchants();
+        reloadableEnable();
 
         ItemEnchantListener itemEnchantListener = new ItemEnchantListener(this, coreGenerator);
         m.registerEvents(itemEnchantListener, this);
@@ -102,7 +102,7 @@ public class EnchantmentCore extends JavaPlugin {
 
         new UpdateChecker(this, 88310).getVersion(version -> {
             if (!this.getDescription().getVersion().equalsIgnoreCase(version.substring(1))) {
-                String str = messagePrefix + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";
+                String str = PREFIX + "There is an update to version " + ChatColor.DARK_AQUA + version + ChatColor.GRAY + " available for ZEnchantmentCore! (Current version: " + ChatColor.DARK_AQUA + "v" + this.getDescription().getVersion() + ChatColor.GRAY + ")";
                 Bukkit.getConsoleSender().sendMessage(str);
                 Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "You can download it at " + ChatColor.DARK_AQUA + "https://www.spigotmc.org/resources/zenchantmentcore.88310/");
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -144,13 +144,13 @@ public class EnchantmentCore extends JavaPlugin {
                         sender.sendMessage(ChatColor.DARK_AQUA + "/" + lowerCmd + " reload" + ChatColor.GRAY + " - reloads config and enchantments");
                         sender.sendMessage(ChatColor.GRAY + "More commands will be added soon\u2122!");
                     } else {
-                        sender.sendMessage(messagePrefix + "Invalid permission.");
+                        sender.sendMessage(PREFIX + "Invalid permission.");
                     }
                 } else {
                     switch (args[0].toLowerCase()) {
                         case "list":
                             if (sender.hasPermission("zenchantmentcore.util")) {
-                                sender.sendMessage(messagePrefix + "List of enchantments: " + (CustomEnch.values().length == 0 ? "None." : ""));
+                                sender.sendMessage(PREFIX + "List of enchantments: " + (CustomEnch.values().length == 0 ? "None." : ""));
                                 for (CustomEnch ce : Stream.of(CustomEnch.allValues()).sorted(Comparator.comparing(ce -> ce.getKey().toString())).collect(Collectors.toList())) {
                                     ChatColor chatColor;
                                     String levelRange;
@@ -168,16 +168,16 @@ public class EnchantmentCore extends JavaPlugin {
                                 }
                                 break;
                             } else {
-                                sender.sendMessage(messagePrefix + "Invalid permission.");
+                                sender.sendMessage(PREFIX + "Invalid permission.");
                             }
                             break;
                         case "check":
                             if (!(sender instanceof Player)) {
-                                sender.sendMessage(messagePrefix + "Cannot be run from console.");
+                                sender.sendMessage(PREFIX + "Cannot be run from console.");
                             } else {
                                 if (sender.hasPermission("zenchantmentcore.util")) {
                                     if (player.getInventory().getItemInMainHand().getType() == org.bukkit.Material.AIR) {
-                                        sender.sendMessage(messagePrefix + "Cannot check for empty hand.");
+                                        sender.sendMessage(PREFIX + "Cannot check for empty hand.");
                                     } else {
                                         org.bukkit.inventory.ItemStack main = player.getInventory().getItemInMainHand();
                                         List<String> messages = new LinkedList<>();
@@ -193,45 +193,45 @@ public class EnchantmentCore extends JavaPlugin {
                                             messages.add(ChatColor.GRAY + " - " + ChatColor.DARK_AQUA + ench.getKey() + " " + entry.getValue());
                                         }
                                         if (messages.isEmpty()) {
-                                            sender.sendMessage(messagePrefix + "Enchantments on main hand: None.");
+                                            sender.sendMessage(PREFIX + "Enchantments on main hand: None.");
                                         } else {
-                                            sender.sendMessage(messagePrefix + "Enchantments on main hand:");
+                                            sender.sendMessage(PREFIX + "Enchantments on main hand:");
                                             for (String msg : messages) {
                                                 sender.sendMessage(msg);
                                             }
                                         }
                                     }
                                 } else {
-                                    sender.sendMessage(messagePrefix + "Invalid permission.");
+                                    sender.sendMessage(PREFIX + "Invalid permission.");
                                 }
                             }
                             break;
                         case "reload":
                             if (!(sender instanceof Player) || sender.hasPermission("zenchantmentcore.reload")) {
-                                sender.sendMessage(messagePrefix + "Reloading...");
-                                reloadableDisable(true);
-                                reloadableEnable(true);
-                                sender.sendMessage(messagePrefix + "Reloaded!");
+                                sender.sendMessage(PREFIX + "Reloading...");
+                                reloadableDisable();
+                                reloadableEnable();
+                                sender.sendMessage(PREFIX + "Reloaded!");
                             } else {
-                                sender.sendMessage(messagePrefix + "Invalid permission.");
+                                sender.sendMessage(PREFIX + "Invalid permission.");
                             }
                             break;
                         case "enchant":
                             return enchantCommand(sender, Arrays.copyOfRange(args, 1, args.length), false);
                         case "info":
                             if (args.length <= 1) {
-                                sender.sendMessage(messagePrefix + "Must specify an enchantment.");
+                                sender.sendMessage(PREFIX + "Must specify an enchantment.");
                                 break;
                             } else if (!sender.hasPermission("zenchantmentcore.util")) {
-                                sender.sendMessage(messagePrefix + "Invalid permission.");
+                                sender.sendMessage(PREFIX + "Invalid permission.");
                                 break;
                             }
                             CustomEnch ench = CustomEnch.getByKey(NamespacedKey.fromString(args[1]));
                             if (ench == null) {
-                                sender.sendMessage(messagePrefix + "Invalid custom enchantment.");
+                                sender.sendMessage(PREFIX + "Invalid custom enchantment.");
                                 break;
                             }
-                            sender.sendMessage(messagePrefix + "Enchantment information for " + ChatColor.DARK_AQUA + ench.getName() + ChatColor.GRAY + ":");
+                            sender.sendMessage(PREFIX + "Enchantment information for " + ChatColor.DARK_AQUA + ench.getName() + ChatColor.GRAY + ":");
                             sender.sendMessage(ChatColor.DARK_AQUA + "Status: " + (ench.isDisabled() ? (ChatColor.RED + "Disabled") : (ChatColor.GREEN + "Enabled")));
                             sender.sendMessage(ChatColor.DARK_AQUA + "Internal ID: " + ChatColor.AQUA + ench.getKey());
                             sender.sendMessage(ChatColor.DARK_AQUA + "Display name: " + ChatColor.AQUA + ench.getDisplayName());
@@ -244,7 +244,7 @@ public class EnchantmentCore extends JavaPlugin {
                             sender.sendMessage(ChatColor.DARK_AQUA + "Occurrence: " + ChatColor.AQUA + (ench.isTreasure() ? "Treasure (loot only)" : "Normal"));
                             break;
                         default:
-                            sender.sendMessage(messagePrefix + "Argument not recognized.");
+                            sender.sendMessage(PREFIX + "Argument not recognized.");
                             break;
                     }
                 }
@@ -252,27 +252,27 @@ public class EnchantmentCore extends JavaPlugin {
             case "enchant":
                 return enchantCommand(sender, args, true);
             default:
-                sender.sendMessage(messagePrefix + "Command not recognized.");
+                sender.sendMessage(PREFIX + "Command not recognized.");
                 return true;
         }
     }
 
     private boolean enchantCommand(CommandSender sender, String[] args, boolean includeVanilla) {
         if (args.length <= 0) {
-            sender.sendMessage(messagePrefix + "Must specify an enchantment.");
+            sender.sendMessage(PREFIX + "Must specify an enchantment.");
         } else if (args.length <= 1) {
-            sender.sendMessage(messagePrefix + "Must specify an enchantment.");
+            sender.sendMessage(PREFIX + "Must specify an enchantment.");
         } else if (!sender.hasPermission("zenchantmentcore.enchant")) {
-            sender.sendMessage(messagePrefix + "Invalid permission.");
+            sender.sendMessage(PREFIX + "Invalid permission.");
         } else {
             Player target = getServer().getPlayer(args[0]);
             if (target == null || !target.isOnline()) {
-                sender.sendMessage(messagePrefix + "That player is not online.");
+                sender.sendMessage(PREFIX + "That player is not online.");
                 return true;
             }
             Enchantment ench = Enchantment.getByKey(NamespacedKey.fromString(args[1]));
             if (ench == null || (!includeVanilla && !(ench instanceof CustomEnch)) || (ench instanceof CustomEnch && ((CustomEnch) ench).isDisabled())) {
-                sender.sendMessage(messagePrefix + "Invalid" + (includeVanilla ? "" : " or vanilla") + " enchantment.");
+                sender.sendMessage(PREFIX + "Invalid" + (includeVanilla ? "" : " or vanilla") + " enchantment.");
                 return true;
             }
             int lvl;
@@ -286,17 +286,17 @@ public class EnchantmentCore extends JavaPlugin {
                 lvl = 1;
             }
             if (lvl > ench.getMaxLevel()) {
-                sender.sendMessage(messagePrefix + args[2] + " is higher than the max level of " + ench.getMaxLevel());
+                sender.sendMessage(PREFIX + args[2] + " is higher than the max level of " + ench.getMaxLevel());
                 return true;
             }
             ItemStack item = target.getInventory().getItemInMainHand();
             ItemMeta oldMeta = item.getItemMeta();
             ItemMeta meta = item.getItemMeta();
             if ((item.getType() != Material.ENCHANTED_BOOK && item.getType() != Material.BOOK && !ench.canEnchantItem(item)) || (!(meta instanceof EnchantmentStorageMeta) && meta.hasEnchant(ench)) || (meta instanceof EnchantmentStorageMeta && ((EnchantmentStorageMeta) meta).hasStoredEnchant(ench))) {
-                sender.sendMessage(messagePrefix + "Cannot apply enchantment to " + item.getType().name().toLowerCase());
+                sender.sendMessage(PREFIX + "Cannot apply enchantment to " + item.getType().name().toLowerCase());
                 return true;
             }
-            sender.sendMessage(messagePrefix + "Applying enchantment " + args[1] + " level " + lvl + " to " + item.getType().name().toLowerCase());
+            sender.sendMessage(PREFIX + "Applying enchantment " + args[1] + " level " + lvl + " to " + item.getType().name().toLowerCase());
             boolean revertBook = false;
             if (item.getType() == Material.BOOK) {
                 item.setType(Material.ENCHANTED_BOOK);
@@ -304,10 +304,10 @@ public class EnchantmentCore extends JavaPlugin {
                 revertBook = true;
             }
             if (!(meta instanceof EnchantmentStorageMeta) && !meta.addEnchant(ench, lvl, false)) {
-                sender.sendMessage(messagePrefix + "Enchantment unsuccessful.");
+                sender.sendMessage(PREFIX + "Enchantment unsuccessful.");
                 return true;
             } else if (meta instanceof EnchantmentStorageMeta && !((EnchantmentStorageMeta) meta).addStoredEnchant(ench, lvl, false)) {
-                sender.sendMessage(messagePrefix + "Enchantment unsuccessful.");
+                sender.sendMessage(PREFIX + "Enchantment unsuccessful.");
                 if (revertBook) {
                     item.setType(Material.BOOK);
                     item.setItemMeta(oldMeta);
@@ -393,30 +393,18 @@ public class EnchantmentCore extends JavaPlugin {
     @Override
     public void onDisable() {
         autoEnchListener.unregister();
-        reloadableDisable(false);
+        reloadableDisable();
     }
 
-    private void reloadableEnable(boolean reloading) {
+    private void reloadableEnable() {
         saveResource("config.yml", false);
         reloadConfig();
         getLogger().info("Custom enchantment generator enabled? " + getConfig().getBoolean("enable-custom-generator"));
-        if (reloading || getConfig().getBoolean("register-on-enable")) {
-            CustomEnch.batchRegister();
-        } else {
-            BukkitRunnable runnable = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    CustomEnch.batchRegister();
-                }
-
-            };
-            runnable.runTaskLater(this, 1L);
-        }
+        CustomEnch.batchRegister();
     }
 
-    private void reloadableDisable(boolean reloading) {
-        for (CustomEnch ce : CustomEnch.values())
-            ce.unregisterEnchantment();
+    private void reloadableDisable() {
+        CustomEnch.batchUnregister();
     }
 
     public int getEnchLimit() {

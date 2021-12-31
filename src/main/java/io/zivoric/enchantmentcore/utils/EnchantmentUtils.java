@@ -249,10 +249,10 @@ public class EnchantmentUtils {
     /**
      * Combines multiple maps of enchantments for the specified item.
      *
-     * @param itemToEnchant The item to combine enchantments for
-     * @param allowIllegal  Indicates that incompatible or conflicting enchantments can be combined and added
+     * @param itemToEnchant     The item to combine enchantments for
+     * @param allowIllegal      Indicates that incompatible or conflicting enchantments can be combined and added
      * @param allowOverMaxLevel Indicates that enchantments can be added to the item that exceed the maximum level
-     * @param maps          Array of multiple maps to combine
+     * @param maps              Array of multiple maps to combine
      * @return Combined map of enchantments
      */
     @SafeVarargs
