@@ -1,7 +1,7 @@
 package io.zivoric.enchantmentcore.paper;
 
-import io.zivoric.enchantmentcore.EnchantmentHolder;
 import net.kyori.adventure.text.Component;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,13 +11,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TranslatableCustomEnch extends PaperCustomEnch {
     /**
-     * <p>Creates a new instance of a <code>PaperCustomEnch</code> with an {@link EnchantmentHolder} and the identifier of the enchantment.</p>
+     * <p>Creates a new instance of a <code>PaperCustomEnch</code> with an {@link Plugin} and the identifier of the enchantment.</p>
      *
-     * @param holder     the <code>EnchantmentHolder</code> for the enchantment
+     * @param plugin     the <code>Plugin</code> for the enchantment
      * @param identifier the internal ID of the enchantment
      */
-    public TranslatableCustomEnch(EnchantmentHolder holder, String identifier) {
-        super(holder, identifier);
+    public TranslatableCustomEnch(Plugin plugin, String identifier) {
+        super(plugin, identifier);
     }
 
     @Override

@@ -2,13 +2,13 @@ package io.zivoric.enchantmentcore.paper;
 
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.zivoric.enchantmentcore.CustomEnch;
-import io.zivoric.enchantmentcore.EnchantmentHolder;
 import io.zivoric.enchantmentcore.utils.EnchEnums.Rarity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -19,13 +19,13 @@ import java.util.Set;
 public abstract class PaperCustomEnch extends CustomEnch {
 
     /**
-     * <p>Creates a new instance of a <code>PaperCustomEnch</code> with an {@link EnchantmentHolder} and the identifier of the enchantment.</p>
+     * <p>Creates a new instance of a <code>PaperCustomEnch</code> with an {@link Plugin} and the identifier of the enchantment.</p>
      *
-     * @param holder     the <code>EnchantmentHolder</code> for the enchantment
+     * @param plugin     the <code>Plugin</code> for the enchantment
      * @param identifier the internal ID of the enchantment
      */
-    public PaperCustomEnch(EnchantmentHolder holder, String identifier) {
-        super(holder, identifier);
+    public PaperCustomEnch(Plugin plugin, String identifier) {
+        super(plugin, identifier);
     }
 
     /**

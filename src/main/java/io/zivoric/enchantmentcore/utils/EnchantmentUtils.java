@@ -249,13 +249,14 @@ public class EnchantmentUtils {
     /**
      * Combines multiple maps of enchantments for the specified item.
      *
-     * @param itemToEnchant The item to combine enchantments for
-     * @param allowIllegal  Indicates that incompatible or conflicting enchantments can be combined and added
-     * @param maps          Array of multiple maps to combine
+     * @param itemToEnchant     The item to combine enchantments for
+     * @param allowIllegal      Indicates that incompatible or conflicting enchantments can be combined and added
+     * @param allowOverMaxLevel Indicates that enchantments can be added to the item that exceed the maximum level
+     * @param maps              Array of multiple maps to combine
      * @return Combined map of enchantments
      */
     @SafeVarargs
-    public static Map<Enchantment, Integer> combineEnchants(ItemStack itemToEnchant, boolean allowIllegal, Map<Enchantment, Integer>... maps) {
+    public static Map<Enchantment, Integer> combineEnchants(ItemStack itemToEnchant, boolean allowIllegal, boolean allowOverMaxLevel, Map<Enchantment, Integer>... maps) {
         Map<Enchantment, Integer> combined = new HashMap<>();
         for (Map<Enchantment, Integer> map : maps) {
             map.forEach((enchant, level) -> {
@@ -268,7 +269,7 @@ public class EnchantmentUtils {
                 }
                 if (!combined.containsKey(enchant) || combined.get(enchant) < level) {
                     combined.put(enchant, level);
-                } else if (combined.get(enchant).equals(level) && level < enchant.getMaxLevel()) {
+                } else if (combined.get(enchant).equals(level) && (allowOverMaxLevel || level < enchant.getMaxLevel())) {
                     combined.put(enchant, level + 1);
                 }
             });

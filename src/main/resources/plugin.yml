@@ -2,6 +2,7 @@ name: ${project.name}
 main: io.zivoric.enchantmentcore.EnchantmentCore
 version: ${project.version}
 api-version: 1.13
+softdepend: [ ProtocolLib ]
 
 commands:
   zenchantment:

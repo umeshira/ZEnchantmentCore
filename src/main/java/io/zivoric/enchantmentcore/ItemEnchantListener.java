@@ -122,6 +122,7 @@ public class ItemEnchantListener implements Listener {
             }
             if (firstSlot.getType() == secondSlot.getType() || secondMeta instanceof EnchantmentStorageMeta) {
                 boolean allowIllegal;
+                boolean allowOverMaxLevel = EnchantmentUtils.generatorSettings().getBoolean("allow-over-max-level");
                 if (gm == GameMode.SURVIVAL || gm == GameMode.ADVENTURE)
                     allowIllegal = EnchantmentUtils.generatorSettings().getBoolean("allow-survival-illegal-enchants");
                 else
@@ -129,12 +130,12 @@ public class ItemEnchantListener implements Listener {
                 Map<Enchantment, Integer> combinedEnchs;
                 Map<Enchantment, Integer> validSacEnchants = EnchantmentUtils.getValidSacrificeEnchants(result, allowIllegal, firstEnchantments, secondEnchantments);
                 repair += secondEnchantments.size() - validSacEnchants.size();
-                combinedEnchs = EnchantmentUtils.combineEnchants(result, allowIllegal, firstEnchantments, secondEnchantments);
+                combinedEnchs = EnchantmentUtils.combineEnchants(result, allowIllegal, allowOverMaxLevel, firstEnchantments, secondEnchantments);
                 for (Entry<Enchantment, Integer> e : validSacEnchants.entrySet())
                     repair += (secondMeta instanceof EnchantmentStorageMeta ? EnchantmentUtils.getAnvilBookMultiplier(e.getKey()) : EnchantmentUtils.getAnvilItemMultiplier(e.getKey())) * combinedEnchs.get(e.getKey());
                 if (!combinedEnchs.equals(firstEnchantments) && validSacEnchants.size() != 0) {
                     EnchantmentUtils.removeAllEnchantments(firstMeta);
-                    EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, false);
+                    EnchantmentUtils.addEnchantments(firstMeta, combinedEnchs, EnchantmentUtils.generatorSettings().getBoolean("ignore-level-restrictions"));
                     EnchantmentUtils.updateItemLore(firstMeta);
                     canApply = true;
                 }

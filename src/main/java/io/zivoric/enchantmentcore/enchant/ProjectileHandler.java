@@ -19,7 +19,9 @@ public interface ProjectileHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the entity is involved with
      */
-    void onHit(LivingEntity entity, List<Integer> levels, List<ItemStack> items, ProjectileHitEvent event);
+    default void onHit(LivingEntity entity, List<Integer> levels, List<ItemStack> items, ProjectileHitEvent event) {
+        // EMPTY
+    }
 
     /**
      * <p>Event method automatically called when an entity using this enchantment hits something with a projectile.</p>
@@ -29,5 +31,7 @@ public interface ProjectileHandler {
      * @param items  Each item currently in use with this enchantment
      * @param event  The event that the entity is involved with
      */
-    void onTargetHit(LivingEntity entity, List<Integer> levels, List<ItemStack> items, ProjectileHitEvent event);
+    default void onTargetHit(LivingEntity entity, List<Integer> levels, List<ItemStack> items, ProjectileHitEvent event) {
+        // EMPTY
+    }
 }

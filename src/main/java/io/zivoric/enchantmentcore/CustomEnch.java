@@ -1,7 +1,9 @@
 package io.zivoric.enchantmentcore;
 
+import io.zivoric.enchantmentcore.plugin.EnchantmentPlugin;
 import io.zivoric.enchantmentcore.utils.EnchEnums;
 import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -15,16 +17,14 @@ import java.util.*;
 /**
  * <p>Represents a custom enchantment handled by ZEnchantmentCore.</p>
  * <p>This class can be extended to create a new custom enchantment to be handled by ZEnchantmentCore.
- * The superconstructor must be passed an {@link EnchantmentHolder}, which holds the enchantment before
+ * The superconstructor must be passed an {@link Plugin}, which holds the enchantment before
  * it is registered in minecraft, and a <code>String</code> representing the internal ID of the enchantment.</p>
- *
- * @see EnchantmentHolder
  */
 public abstract class CustomEnch extends Enchantment {
     private static final Field byKeyField;
     private static final Field byNameField;
 
-    private static final List<CustomEnch> pendingEnchants = new ArrayList<>();
+    private static final List<CustomEnch> loadedEnchants = new ArrayList<>();
     private static final Map<NamespacedKey, CustomEnch> byKey = new LinkedHashMap<>();
     private static final Map<String, CustomEnch> byName = new LinkedHashMap<>();
     private static int nextID = 0;
@@ -55,24 +55,37 @@ public abstract class CustomEnch extends Enchantment {
     private boolean disabled = false;
 
     /**
-     * <p>Creates a new instance of a <code>CustomEnch</code> with an {@link EnchantmentHolder} and the identifier of the enchantment.</p>
+     * <p>Creates a new instance of a <code>CustomEnch</code> with an {@link Plugin} and the identifier of the enchantment.</p>
      *
-     * @param holder     the <code>EnchantmentHolder</code> for the enchantment
+     * @param plugin     the <code>Plugin</code> for the enchantment
      * @param identifier the internal ID of the enchantment
      */
-    public CustomEnch(EnchantmentHolder holder, String identifier) {
-        super(new NamespacedKey(holder.getOwnerPlugin(), identifier));
+    public CustomEnch(Plugin plugin, String identifier) {
+        super(new NamespacedKey(plugin, identifier));
         coreID = nextID;
         nextID++;
-        ownerPlugin = holder.getOwnerPlugin();
-        holder.addEnchant(this);
+        ownerPlugin = plugin;
+    }
+
+    static void loadEnchants() {
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            if (plugin instanceof EnchantmentPlugin) {
+                EnchantmentPlugin ep = (EnchantmentPlugin) plugin;
+                loadedEnchants.addAll(ep.getEnchants());
+            }
+        }
+        loadedEnchants.sort(Comparator.comparingInt(CustomEnch::getPriority));
     }
 
     static void batchRegister() {
-        pendingEnchants.sort(Comparator.comparingInt(CustomEnch::getPriority));
-        Collections.reverse(pendingEnchants);
-        for (CustomEnch ce : pendingEnchants) {
+        for (CustomEnch ce : loadedEnchants) {
             ce.registerEnchantment();
+        }
+    }
+
+    static void batchUnregister() {
+        for (CustomEnch ce : values()) {
+            ce.unregisterEnchantment();
         }
     }
 
@@ -122,7 +135,7 @@ public abstract class CustomEnch extends Enchantment {
      * @return Array of all custom enchantments
      */
     public static CustomEnch[] allValues() {
-        return pendingEnchants.toArray(new CustomEnch[0]);
+        return loadedEnchants.toArray(new CustomEnch[0]);
     }
 
     void registerEnchantment() {
@@ -152,10 +165,6 @@ public abstract class CustomEnch extends Enchantment {
                 e.printStackTrace();
             }
         }
-    }
-
-    void addToPending() {
-        pendingEnchants.add(this);
     }
 
     /**

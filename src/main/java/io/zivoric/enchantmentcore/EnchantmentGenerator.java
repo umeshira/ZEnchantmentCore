@@ -32,12 +32,6 @@ public class EnchantmentGenerator {
     private final Random r = new Random();
 
     /**
-     * Creates a new <code>EnchantmentGenerator</code>.
-     */
-    public EnchantmentGenerator() {
-    }
-
-    /**
      * Gets list of enchantment offers based on different generator parameters and settings.
      *
      * @param item             The item to get the offers for
@@ -202,7 +196,7 @@ public class EnchantmentGenerator {
             enchantability = 15;
         else if (EnchEnums.MaterialType.DIAMOND.contains(mat) || EnchEnums.MaterialType.DIAMOND_ARMOR.contains(mat))
             enchantability = 10;
-        // else if (EnchEnums.MaterialType.ENCHANTED_BOOK.contains(mat)) enchantability = 1;
+            // else if (EnchEnums.MaterialType.ENCHANTED_BOOK.contains(mat)) enchantability = 1;
         else if (EnchEnums.MaterialType.TURTLE_SHELL.contains(mat) || EnchEnums.MaterialType.IRON.contains(mat))
             enchantability = 9;
         else if (EnchEnums.MaterialType.STONE.contains(mat)) enchantability = 5;
@@ -327,6 +321,7 @@ public class EnchantmentGenerator {
 
     /**
      * Gets this custom generator's enchanting seed for the player.
+     *
      * @param enchanter The player
      * @return The enchantment seed for the player
      */
@@ -342,8 +337,9 @@ public class EnchantmentGenerator {
 
     /**
      * Sets a given player's enchanting seed to a new random value.
-     * @param   enchanter The player
-     * @return  The updated seed
+     *
+     * @param enchanter The player
+     * @return The updated seed
      */
     public int updateXpSeed(Player enchanter) {
         int random = r.nextInt();
@@ -353,6 +349,7 @@ public class EnchantmentGenerator {
 
     /**
      * Sets a given player's enchanting seed to the specified value.
+     *
      * @param enchanter The player
      * @param seed      The seed to set to
      */
