@@ -29,7 +29,9 @@ public class VersionUtils {
 
     static {
         String bukkitVers = Bukkit.getVersion();
-        if (bukkitVers.contains("1.17")) {
+        if (bukkitVers.contains("1.18")) {
+            SERVER_VERSION = 18;
+        } else if (bukkitVers.contains("1.17")) {
             SERVER_VERSION = 17;
         } else if (bukkitVers.contains("1.16")) {
             SERVER_VERSION = 16;

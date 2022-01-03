@@ -61,6 +61,7 @@ public class EnchantmentCore extends JavaPlugin {
     public void onEnable() {
         PluginManager m = getServer().getPluginManager();
         switch (VersionUtils.SERVER_VERSION) {
+            case 18:
             case 17:
             case 16:
                 enchLimit = 37;
