@@ -1,8 +1,8 @@
 package io.zivoric.enchantmentcore;
 
-import io.zivoric.enchantmentcore.autoenchlistener.AutoEnchListener;
-import io.zivoric.enchantmentcore.autoenchlistener.ProtocolAutoEnchListener;
-import io.zivoric.enchantmentcore.autoenchlistener.SimpleAutoEnchListener;
+import io.zivoric.enchantmentcore.auto.AutoEnchListener;
+import io.zivoric.enchantmentcore.auto.ProtocolAutoEnchListener;
+import io.zivoric.enchantmentcore.auto.SimpleAutoEnchListener;
 import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
 import io.zivoric.enchantmentcore.utils.UpdateChecker;
 import io.zivoric.enchantmentcore.utils.VersionUtils;
@@ -79,6 +79,7 @@ public class EnchantmentCore extends JavaPlugin {
         }
 
         getLogger().info("Running ZEnchantmentCore on environment " + VersionUtils.BUKKIT_TYPE + " 1." + VersionUtils.SERVER_VERSION);
+        getLogger().info("Currently using listener " + autoEnchListener.getClass().getSimpleName());
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
         CustomEnch.loadEnchants();
@@ -86,8 +87,6 @@ public class EnchantmentCore extends JavaPlugin {
 
         ItemEnchantListener itemEnchantListener = new ItemEnchantListener(this, coreGenerator);
         m.registerEvents(itemEnchantListener, this);
-
-        getLogger().info("Use " + autoEnchListener.getClass().getSimpleName());
         autoEnchListener.setup();
 
         customEnchListener.register();
@@ -397,7 +396,7 @@ public class EnchantmentCore extends JavaPlugin {
     }
 
     private void reloadableEnable() {
-        saveResource("config.yml", false);
+        saveDefaultConfig();
         reloadConfig();
         getLogger().info("Custom enchantment generator enabled? " + getConfig().getBoolean("enable-custom-generator"));
         CustomEnch.batchRegister();

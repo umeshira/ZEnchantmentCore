@@ -1,4 +1,4 @@
-package io.zivoric.enchantmentcore.autoenchlistener;
+package io.zivoric.enchantmentcore.auto;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;

@@ -1,4 +1,4 @@
-package io.zivoric.enchantmentcore.autoenchlistener;
+package io.zivoric.enchantmentcore.auto;
 
 import io.zivoric.enchantmentcore.EnchantmentCore;
 import io.zivoric.enchantmentcore.utils.EnchantmentUtils;
