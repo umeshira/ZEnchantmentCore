@@ -22,7 +22,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
@@ -84,7 +83,8 @@ public class EnchantmentCore extends JavaPlugin {
         getLogger().info("Currently using listener " + autoEnchListener.getClass().getSimpleName());
         coreGenerator = new EnchantmentGenerator();
         instance = getPlugin(this.getClass());
-        reloadableEnable(false);
+        CustomEnch.loadEnchants();
+        reloadableEnable();
         ItemEnchantListener itemEnchantListener = new ItemEnchantListener(this, coreGenerator);
         m.registerEvents(itemEnchantListener, this);
         autoEnchListener.setup();
@@ -209,7 +209,7 @@ public class EnchantmentCore extends JavaPlugin {
                             if (!(sender instanceof Player) || sender.hasPermission("zenchantmentcore.reload")) {
                                 sender.sendMessage(PREFIX + "Reloading...");
                                 reloadableDisable();
-                                reloadableEnable(true);
+                                reloadableEnable();
                                 sender.sendMessage(PREFIX + "Reloaded!");
                             } else {
                                 sender.sendMessage(PREFIX + "Invalid permission.");
@@ -395,18 +395,11 @@ public class EnchantmentCore extends JavaPlugin {
         reloadableDisable();
     }
 
-    private void reloadableEnable(boolean reloading) {
+    private void reloadableEnable() {
         saveDefaultConfig();
         reloadConfig();
         getLogger().info("Custom enchantment generator enabled? " + getConfig().getBoolean("enable-custom-generator"));
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!reloading) CustomEnch.loadEnchants();
-                CustomEnch.batchRegister();
-            }
-        };
-        runnable.runTaskLater(this, 1L);
+        CustomEnch.batchRegister();
     }
 
     private void reloadableDisable() {
