@@ -362,7 +362,11 @@ public class EnchantmentUtils {
     public static int getAnvilCost(ItemStack item) {
         try {
             Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            return (int) nmsItem.getClass().getMethod("getRepairCost").invoke(nmsItem);
+            String repairMethod = "getRepairCost";
+            if (VersionUtils.SERVER_VERSION >= 18) {
+                repairMethod = "F";
+            }
+            return (int) nmsItem.getClass().getMethod(repairMethod).invoke(nmsItem);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -390,7 +394,11 @@ public class EnchantmentUtils {
     public static ItemStack setAnvilCost(ItemStack item, int num) {
         try {
             Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            nmsItem.getClass().getMethod("setRepairCost", int.class).invoke(nmsItem, num);
+            String repairMethod = "setRepairCost";
+            if (VersionUtils.SERVER_VERSION >= 18) {
+                repairMethod = "c";
+            }
+            nmsItem.getClass().getMethod(repairMethod, int.class).invoke(nmsItem, num);
             return (ItemStack) VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
         } catch (Exception e) {
             e.printStackTrace();
