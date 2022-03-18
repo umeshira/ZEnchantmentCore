@@ -64,8 +64,9 @@ public class ItemEnchantListener implements Listener {
                 event.getEnchantsToAdd().put(e, enchants.getLevels().get(enchants.getEnchs().indexOf(e)));
             }
         }
-        ItemStack item = event.getItem();
         Bukkit.getScheduler().scheduleSyncDelayedTask(core, () -> {
+            ItemStack item = event.getInventory().getItem(0);
+            if (item == null) return;
             ItemMeta iMeta = item.getItemMeta();
             if (iMeta instanceof EnchantmentStorageMeta) {
                 EnchantmentStorageMeta eMeta = (EnchantmentStorageMeta) iMeta;
