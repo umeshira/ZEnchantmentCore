@@ -410,7 +410,7 @@ public class EnchantmentUtils {
             if (repairClass.isInstance(meta)) {
                 setRepairCost.invoke(meta, num);
             }
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
             try {
                 Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
                 String repairMethod = "setRepairCost";
@@ -422,6 +422,8 @@ public class EnchantmentUtils {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return item.clone();
     }
