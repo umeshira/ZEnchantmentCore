@@ -17,6 +17,8 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
@@ -361,14 +363,23 @@ public class EnchantmentUtils {
      */
     public static int getAnvilCost(ItemStack item) {
         try {
-            Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            String repairMethod = "getRepairCost";
-            if (VersionUtils.SERVER_VERSION >= 18) {
-                repairMethod = "F";
+            Class<?> repairClass = Class.forName("org.bukkit.inventory.meta.Repairable");
+            Method getRepairCost = repairClass.getMethod("getRepairCost");
+            ItemMeta meta = item.getItemMeta();
+            if (repairClass.isInstance(meta)) {
+                return (int) getRepairCost.invoke(meta);
             }
-            return (int) nmsItem.getClass().getMethod(repairMethod).invoke(nmsItem);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            try {
+                Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+                String repairMethod = "getRepairCost";
+                if (VersionUtils.SERVER_VERSION >= 18) {
+                    repairMethod = "F";
+                }
+                return (int) nmsItem.getClass().getMethod(repairMethod).invoke(nmsItem);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         }
         return 0;
     }
@@ -393,15 +404,24 @@ public class EnchantmentUtils {
      */
     public static ItemStack setAnvilCost(ItemStack item, int num) {
         try {
-            Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-            String repairMethod = "setRepairCost";
-            if (VersionUtils.SERVER_VERSION >= 18) {
-                repairMethod = "c";
+            Class<?> repairClass = Class.forName("org.bukkit.inventory.meta.Repairable");
+            Method setRepairCost = repairClass.getMethod("setRepairCost", int.class);
+            ItemMeta meta = item.getItemMeta();
+            if (repairClass.isInstance(meta)) {
+                setRepairCost.invoke(meta, num);
             }
-            nmsItem.getClass().getMethod(repairMethod, int.class).invoke(nmsItem, num);
-            return (ItemStack) VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            try {
+                Object nmsItem = VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+                String repairMethod = "setRepairCost";
+                if (VersionUtils.SERVER_VERSION >= 18) {
+                    repairMethod = "c";
+                }
+                nmsItem.getClass().getMethod(repairMethod, int.class).invoke(nmsItem, num);
+                return (ItemStack) VersionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asBukkitCopy", nmsItem.getClass()).invoke(null, nmsItem);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
         }
         return item.clone();
     }
