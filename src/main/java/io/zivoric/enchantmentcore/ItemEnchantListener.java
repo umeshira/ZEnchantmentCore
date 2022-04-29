@@ -43,7 +43,7 @@ public class ItemEnchantListener implements Listener {
         if (core.getConfig().getBoolean("enable-custom-generator")) {
             List<EnchantmentInformation> offers = generator.getOffers(event.getItem(), event.getEnchanter(), event.getEnchantmentBonus(), EnchantmentUtils.generatorSettings().getDouble("enchantment-amount-multiplier"), EnchantmentUtils.generatorSettings().getBoolean("allow-stacked-books"), EnchantmentUtils.generatorSettings().getBoolean("allow-treasure-enchants"), EnchantmentUtils.generatorSettings().getBoolean("treat-axes-as-weapons"));
             for (EnchantmentInformation offer : offers) {
-                if (offer == null) continue;
+                if (offer == null || offer.getEnchs().isEmpty() || offer.getLevels().isEmpty()) continue;
                 Enchantment firstEnch = offer.getEnchs().get(0);
                 int firstLevel = offer.getLevels().get(0);
                 int cost = offer.getCost();
