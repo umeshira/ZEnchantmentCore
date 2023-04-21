@@ -59,6 +59,7 @@ public class EnchEnums {
         POWER(1, 10, 1 + 15, 10), PUNCH(12, 20, 12 + 25, 20), FLAME(20, 0, 50, 0), INFINITY(20, 0, 50, 0),
         LUCK_OF_THE_SEA(15, 9, 15 + 50, 9), LURE(15, 9, 15 + 50, 9), LOYALTY(5, 7, 5 + 50, 7), IMPALING(1, 8, 1 + 20, 8), RIPTIDE(10, 7, 10 + 50, 7), CHANNELING(25, 0, 50, 0),
         MULTISHOT(20, 0, 50, 0), QUICK_CHARGE(12, 20, 12 + 50, 20), PIERCING(1, 10, 50, 0), MENDING(0, 25, 50, 25), VANISHING_CURSE(25, 0, 50, 0),
+        SWIFT_SNEAK(0, 25, 0 + 50, 25),
         PLACEHOLDER(0, 0, 0, 0);
 
         private final int minM;

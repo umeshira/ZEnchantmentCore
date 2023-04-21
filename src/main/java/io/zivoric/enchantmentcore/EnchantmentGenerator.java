@@ -83,7 +83,11 @@ public class EnchantmentGenerator {
                 for (Entry<Enchantment, Integer> entry : possibilities.entrySet()) {
                     Enchantment e = entry.getKey();
                     int lvl = entry.getValue();
+                    // Soul speed
                     if (VersionUtils.SERVER_VERSION >= 16 && e.equals(Enchantment.SOUL_SPEED) && !table.equals(LootTables.BASTION_OTHER.getLootTable()))
+                        continue;
+                    // Swift sneak
+                    if (VersionUtils.SERVER_VERSION >= 19 && e.equals(Enchantment.SWIFT_SNEAK) && !table.equals(LootTables.ANCIENT_CITY.getLootTable()))
                         continue;
                     randRange -= 10;
                     if (randRange < 0) {

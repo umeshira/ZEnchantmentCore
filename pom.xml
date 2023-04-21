@@ -6,7 +6,7 @@
 
     <groupId>io.zivoric</groupId>
     <artifactId>enchantmentcore</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
 
     <name>ZEnchantmentCore</name>
 
@@ -42,8 +42,8 @@
                 </executions>
                 <configuration>
                     <links>
-                        <link>https://papermc.io/javadocs/paper/1.17/</link>
-                        <link>https://jd.adventure.kyori.net/api/4.8.1/</link>
+                        <link>https://papermc.io/javadocs/paper/1.19/</link>
+                        <link>https://jd.adventure.kyori.net/api/4.13.1/</link>
                     </links>
                 </configuration>
             </plugin>
@@ -98,13 +98,13 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.19.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.7.0</version>
+            <version>4.8.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
